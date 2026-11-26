@@ -87,28 +87,22 @@ for token in shlex.split(flags.get("CXX_FLAGS", "")):
 if not defines:
     defines = ["-DITKLIB_NO_EXTRA_DEFINES=1"]
 
-link_text = uncontinued(build / "CMakeFiles" / "probe.dir" / "link.txt")
-tokens = shlex.split(link_text)
-link = []
-skip_next = False
-for token in tokens:
-    if skip_next:
-        skip_next = False
-        continue
-    if token == "-o":
-        skip_next = True
-        continue
-    if token in ("-shared", "-fPIC", "-rdynamic"):
-        continue
-    if token.startswith("-Wl,-soname"):
-        continue
-    if token.endswith((".o", ".obj", ".cpp", ".cxx")):
-        continue
-    if token.startswith(("-L", "-l", "-Wl,", "-pthread")) or token == "-pthread":
-        link.append(token)
-        continue
+def keep_link(token):
+    # CMake records a dependency file next to the probe. That path is
+    # relative to the probe build directory and must not be replayed
+    # when gprbuild links itklib.
+    if "dependency-file" in token or "CMakeFiles" in token or token.endswith("link.d"):
+        return False
+    if token.startswith("-Wl,-rpath"):
+        return True
+    if token.startswith(("-L", "-l")) or token in ("-pthread", "-Wl,-pthread"):
+        return True
     if token.startswith("/") and (".so" in token or token.endswith(".a")):
-        link.append(token)
+        return True
+    return False
+
+link_text = uncontinued(build / "CMakeFiles" / "probe.dir" / "link.txt")
+link = [token for token in shlex.split(link_text) if keep_link(token)]
 
 import subprocess
 printed = subprocess.check_output(
