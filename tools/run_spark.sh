@@ -21,8 +21,10 @@ if ! command -v gnatprove >/dev/null 2>&1; then
   export PATH="${CACHE}/${NAME}/bin:${PATH}"
 fi
 
+# A short per-check limit is enough once the contracts are local. CI runners
+# are slower than a warm workstation, so keep a little slack.
 gnatprove -P tests/spark/spark_core.gpr --mode=silver --level=2 \
-  --checks-as-errors=on -j"$(nproc)"
+  --timeout=30 --checks-as-errors=on -j"$(nproc)"
 gnatprove -P tests/spark/spark_parser.gpr --mode=silver --level=2 \
-  --checks-as-errors=on -j"$(nproc)"
+  --timeout=30 --checks-as-errors=on -j"$(nproc)"
 echo "gnatprove silver passed"

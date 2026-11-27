@@ -20,13 +20,13 @@ package body Itklib.Core.Regions with SPARK_Mode => On is
    begin
       for A in Axis loop
          pragma Loop_Invariant (Acc >= 1);
-         if Extent (A) = 0
-           or else Acc > Interfaces.Unsigned_64'Last / Extent (A)
+         if Extent (A) > 0
+           and then Acc <= Interfaces.Unsigned_64'Last / Extent (A)
          then
-            return Acc;
+            Acc := Acc * Extent (A);
          end if;
-         Acc := Acc * Extent (A);
       end loop;
+      pragma Assert (Acc >= 1);
       return Acc;
    end Volume;
 
