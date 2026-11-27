@@ -10,12 +10,15 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT}"
 
 if ! command -v gnatprove >/dev/null 2>&1; then
-  DEST="${ROOT}/.cache/gnatprove"
-  if [[ ! -x "${DEST}/bin/gnatprove" ]]; then
-    mkdir -p "${ROOT}/.cache"
-    alr -n get gnatprove --dirname "${DEST}"
+  # Outside the crate. alr refuses to deploy a release inside another one,
+  # and --dirname only prints the folder name.
+  CACHE="${HOME}/.cache/itklib-gnatprove"
+  mkdir -p "${CACHE}"
+  NAME="$(alr -n get gnatprove=16.1.0 --dirname)"
+  if [[ ! -x "${CACHE}/${NAME}/bin/gnatprove" ]]; then
+    (cd "${CACHE}" && alr -n get gnatprove=16.1.0)
   fi
-  export PATH="${DEST}/bin:${PATH}"
+  export PATH="${CACHE}/${NAME}/bin:${PATH}"
 fi
 
 gnatprove -P tests/spark/spark_core.gpr --mode=silver --level=2 \
