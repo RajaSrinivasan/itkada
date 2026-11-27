@@ -159,24 +159,73 @@ package body Itklib.Images with SPARK_Mode => Off is
       Count : Interfaces.Unsigned_64 := 0;
       Ptr : System.Address := System.Null_Address;
    begin
-      Thin.Image_Buffer (Img.Handle, Ptr, Count);
-      if Count = 0 or else Ptr = System.Null_Address then
-         declare
-            Empty : Pixel_Array (1 .. 0);
-         begin
-            Process (Empty);
-         end;
-         return;
-      end if;
-
-      declare
-         Data : Pixel_Array (0 .. Count - 1);
-         pragma Import (C, Data);
-         for Data'Address use Ptr;
+      Thin.Image_Buffer_Lock (Img.Handle);
       begin
-         Process (Data);
+         Thin.Image_Buffer (Img.Handle, Ptr, Count);
+         if Count = 0 or else Ptr = System.Null_Address then
+            declare
+               Empty : Pixel_Array (1 .. 0);
+            begin
+               Process (Empty);
+            end;
+         else
+            declare
+               Data : Pixel_Array (0 .. Count - 1);
+               pragma Import (C, Data);
+               for Data'Address use Ptr;
+            begin
+               Process (Data);
+            end;
+         end if;
+         Thin.Image_Buffer_Unlock (Img.Handle);
+      exception
+         when others =>
+            Thin.Image_Buffer_Unlock (Img.Handle);
+            raise;
       end;
    end With_Buffer;
+
+   function To_Index (Value : Index) return Thin.Index_Array is
+      Raw : Thin.Index_Array (1 .. Dimension);
+      K : Positive := 1;
+   begin
+      for Item of Value loop
+         Raw (K) := Item;
+         K := K + 1;
+      end loop;
+      return Raw;
+   end To_Index;
+
+   function Transform_Index_To_Physical_Point
+     (Img : Image; Idx : Index) return Vector
+   is
+      Point : Thin.Double_Array (1 .. Dimension);
+      Result : Vector;
+   begin
+      Thin.Image_Index_To_Physical (Img.Handle, To_Index (Idx), Point);
+      for Axis_Id in Axis loop
+         Result (Axis_Id) := Long_Float (Point (Positive (Axis_Id)));
+      end loop;
+      return Result;
+   end Transform_Index_To_Physical_Point;
+
+   function Transform_Physical_Point_To_Index
+     (Img : Image; Point : Vector) return Index
+   is
+      Raw : Thin.Index_Array (1 .. Dimension);
+      Result : Index;
+   begin
+      Thin.Image_Physical_To_Index (Img.Handle, To_Doubles (Point), Raw);
+      for Axis_Id in Axis loop
+         Result (Axis_Id) := Raw (Positive (Axis_Id));
+      end loop;
+      return Result;
+   end Transform_Physical_Point_To_Index;
+
+   procedure Disconnect_Pipeline (Img : in out Image) is
+   begin
+      Thin.Image_Disconnect (Img.Handle);
+   end Disconnect_Pipeline;
 
 begin
    if not Itklib.Thin.Is_Supported (Pixel_Kind_Id, Dimension) then

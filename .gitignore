@@ -1,5 +1,8 @@
 /obj/
 /lib/
+/.cache/
+__pycache__/
+*.pyc
 /bin/
 /alire/
 /config/

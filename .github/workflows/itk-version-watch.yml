@@ -1,0 +1,29 @@
+name: ITK version watch
+
+# Non-blocking look at the version-bump policy: newest non-prerelease ITK
+# tag versus the distro insighttoolkit package. It does not change the
+# 5.4.8 pin used by the main workflow.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1"
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Compare ITK tag and apt
+        run: |
+          tag=$(curl -fsSL https://api.github.com/repos/InsightSoftwareConsortium/ITK/releases?per_page=20 \
+            | python3 -c 'import json,sys,re
+          rels=json.load(sys.stdin)
+          for rel in rels:
+              name=rel.get("tag_name","")
+              if re.fullmatch(r"v[0-9]+(\.[0-9]+)+", name):
+                  print(name)
+                  break
+          ')
+          echo "newest stable tag: ${tag:-unknown}"
+          apt-cache policy libinsighttoolkit5-dev || true
+          echo "itklib still pins 5.4.8 until a bump PR updates tools/build_itk.sh"

@@ -93,12 +93,66 @@ int itklib_discrete_gaussian_set_variance (itklib_object * filter,
 int itklib_discrete_gaussian_set_use_image_spacing (itklib_object * filter,
                                                     int enabled,
                                                     itklib_error * error);
+int itklib_discrete_gaussian_set_maximum_error (itklib_object * filter,
+                                                const double * maximum_error,
+                                                itklib_error * error);
+
+enum {
+  ITKLIB_FILTER_MEDIAN = 1,
+  ITKLIB_FILTER_THRESHOLD = 2,
+  ITKLIB_FILTER_RESCALE = 3,
+  ITKLIB_FILTER_SHRINK = 4,
+  ITKLIB_FILTER_RESAMPLE = 5,
+  ITKLIB_FILTER_FLIP = 6,
+  ITKLIB_FILTER_EXTRACT = 7,
+  ITKLIB_FILTER_GRADIENT = 8,
+  ITKLIB_FILTER_STATISTICS = 9
+};
+
+int itklib_filter_new (int kind, itklib_pixel_id pixel, unsigned dimension,
+                       itklib_object ** out, itklib_error * error);
+int itklib_median_set_radius (itklib_object * filter, const uint64_t * radius,
+                              itklib_error * error);
+int itklib_threshold_set (itklib_object * filter, double lower, double upper,
+                          double inside_value, double outside_value,
+                          itklib_error * error);
+int itklib_rescale_set_output_range (itklib_object * filter, double minimum,
+                                     double maximum, itklib_error * error);
+int itklib_shrink_set_factors (itklib_object * filter, const uint64_t * factors,
+                               itklib_error * error);
+int itklib_resample_configure (itklib_object * filter, const uint64_t * size,
+                               const double * spacing, const double * origin,
+                               const double * direction, double default_pixel,
+                               itklib_error * error);
+int itklib_resample_set_uniform_scale (itklib_object * filter, double scale,
+                                       itklib_error * error);
+int itklib_flip_set_axes (itklib_object * filter, const int * axes,
+                          int about_origin, itklib_error * error);
+int itklib_extract_set_region (itklib_object * filter, const int64_t * index,
+                               const uint64_t * size, itklib_error * error);
+int itklib_gradient_set_use_image_spacing (itklib_object * filter, int enabled,
+                                           itklib_error * error);
+int itklib_statistics_get (itklib_object * filter, double * minimum,
+                           double * maximum, double * mean, itklib_error * error);
 
 int itklib_set_input (itklib_object * filter, unsigned index,
                       itklib_object * image, itklib_error * error);
 int itklib_update (itklib_object * process, itklib_error * error);
+int itklib_modified (itklib_object * process, itklib_error * error);
+int itklib_update_largest_possible_region (itklib_object * process,
+                                           itklib_error * error);
+int itklib_set_number_of_work_units (itklib_object * process, unsigned count,
+                                     itklib_error * error);
 int itklib_get_output (itklib_object * process, unsigned index,
                        itklib_object ** image, itklib_error * error);
+
+int itklib_image_buffer_lock (itklib_object * image, itklib_error * error);
+int itklib_image_buffer_unlock (itklib_object * image, itklib_error * error);
+int itklib_image_disconnect (itklib_object * image, itklib_error * error);
+int itklib_image_index_to_physical (itklib_object * image, const int64_t * index,
+                                    double * point, itklib_error * error);
+int itklib_image_physical_to_index (itklib_object * image, const double * point,
+                                    int64_t * index, itklib_error * error);
 
 #ifdef __cplusplus
 }

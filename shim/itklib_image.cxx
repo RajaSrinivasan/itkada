@@ -171,6 +171,54 @@ image_set_direction (itklib_object * image, const double * direction)
   concrete->SetDirection (matrix);
 }
 
+template <unsigned Dimension>
+void
+image_index_to_physical (itklib_object * image, const int64_t * index,
+                         double * point)
+{
+  auto * concrete = as_image<Dimension> (image);
+  if (concrete == nullptr || index == nullptr || point == nullptr)
+    {
+      throw itklib_status{ITKLIB_E_ARG, "invalid physical-point arguments",
+                          "itklib_image_index_to_physical"};
+    }
+  typename itk::Image<std::uint16_t, Dimension>::IndexType idx;
+  typename itk::Image<std::uint16_t, Dimension>::PointType physical;
+  for (unsigned axis = 0; axis < Dimension; ++axis)
+    {
+      idx[axis] = index[axis];
+    }
+  concrete->TransformIndexToPhysicalPoint (idx, physical);
+  for (unsigned axis = 0; axis < Dimension; ++axis)
+    {
+      point[axis] = physical[axis];
+    }
+}
+
+template <unsigned Dimension>
+void
+image_physical_to_index (itklib_object * image, const double * point,
+                         int64_t * index)
+{
+  auto * concrete = as_image<Dimension> (image);
+  if (concrete == nullptr || point == nullptr || index == nullptr)
+    {
+      throw itklib_status{ITKLIB_E_ARG, "invalid index arguments",
+                          "itklib_image_physical_to_index"};
+    }
+  typename itk::Image<std::uint16_t, Dimension>::PointType physical;
+  typename itk::Image<std::uint16_t, Dimension>::IndexType idx;
+  for (unsigned axis = 0; axis < Dimension; ++axis)
+    {
+      physical[axis] = point[axis];
+    }
+  concrete->TransformPhysicalPointToIndex (physical, idx);
+  for (unsigned axis = 0; axis < Dimension; ++axis)
+    {
+      index[axis] = idx[axis];
+    }
+}
+
 } // namespace
 
 /* Explicit Phase 0 instances. The functions below instantiate them too. */
@@ -316,6 +364,116 @@ itklib_image_set_direction (itklib_object * image, const double * direction,
     else
       {
         image_set_direction<3> (image, direction);
+      }
+  });
+}
+
+extern "C" int
+itklib_image_buffer_lock (itklib_object * image, itklib_error * error)
+{
+  return itklib_guard (error, [&] {
+    if (image == nullptr || image->obj == nullptr
+        || image->klass != ITKLIB_CLASS_IMAGE)
+      {
+        throw itklib_status{ITKLIB_E_ARG, "buffer lock needs an image",
+                            "itklib_image_buffer_lock"};
+      }
+    itklib_buffer_lock_add (image->obj, 1);
+  });
+}
+
+extern "C" int
+itklib_image_buffer_unlock (itklib_object * image, itklib_error * error)
+{
+  return itklib_guard (error, [&] {
+    if (image == nullptr || image->obj == nullptr
+        || image->klass != ITKLIB_CLASS_IMAGE)
+      {
+        throw itklib_status{ITKLIB_E_ARG, "buffer unlock needs an image",
+                            "itklib_image_buffer_unlock"};
+      }
+    itklib_buffer_lock_add (image->obj, -1);
+  });
+}
+
+extern "C" int
+itklib_image_disconnect (itklib_object * image, itklib_error * error)
+{
+  return itklib_guard (error, [&] {
+    if (image == nullptr || image->obj == nullptr
+        || image->klass != ITKLIB_CLASS_IMAGE)
+      {
+        throw itklib_status{ITKLIB_E_ARG, "disconnect needs an image",
+                            "itklib_image_disconnect"};
+      }
+    auto * data = dynamic_cast<itk::DataObject *> (image->obj);
+    if (data == nullptr)
+      {
+        throw itklib_status{ITKLIB_E_ARG, "handle is not a data object",
+                            "itklib_image_disconnect"};
+      }
+    data->DisconnectPipeline ();
+    if (image->anchor != nullptr)
+      {
+        itk::LightObject * anchor = image->anchor;
+        const int refs = image->refs.load (std::memory_order_relaxed);
+        image->anchor = nullptr;
+        for (int count = 0; count < refs; ++count)
+          {
+            anchor->UnRegister ();
+          }
+      }
+  });
+}
+
+extern "C" int
+itklib_image_index_to_physical (itklib_object * image, const int64_t * index,
+                                double * point, itklib_error * error)
+{
+  return itklib_guard (error, [&] {
+    if (image == nullptr)
+      {
+        throw itklib_status{ITKLIB_E_NULL, "null image",
+                            "itklib_image_index_to_physical"};
+      }
+    if (image->dim == 2)
+      {
+        image_index_to_physical<2> (image, index, point);
+      }
+    else if (image->dim == 3)
+      {
+        image_index_to_physical<3> (image, index, point);
+      }
+    else
+      {
+        throw itklib_status{ITKLIB_E_UNSUPPORTED, "unsupported image dimension",
+                            "itklib_image_index_to_physical"};
+      }
+  });
+}
+
+extern "C" int
+itklib_image_physical_to_index (itklib_object * image, const double * point,
+                                int64_t * index, itklib_error * error)
+{
+  return itklib_guard (error, [&] {
+    if (image == nullptr)
+      {
+        throw itklib_status{ITKLIB_E_NULL, "null image",
+                            "itklib_image_physical_to_index"};
+      }
+    if (image->dim == 2)
+      {
+        image_physical_to_index<2> (image, point, index);
+      }
+    else if (image->dim == 3)
+      {
+        image_physical_to_index<3> (image, point, index);
+      }
+    else
+      {
+        throw itklib_status{ITKLIB_E_UNSUPPORTED, "unsupported image dimension",
+                            "itklib_image_physical_to_index"};
       }
   });
 }

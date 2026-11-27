@@ -27,6 +27,17 @@ package body Itklib.Filters.Smoothing.Discrete_Gaussian with SPARK_Mode => Off i
       Thin.Gaussian_Set_Variance (F.Raw_Handle, Raw);
    end Set_Variance;
 
+   procedure Set_Maximum_Error (F : in out Filter; Value : Input.Vector) is
+      Raw : Thin.Double_Array (1 .. Input.Image_Dimension);
+      K : Positive := 1;
+   begin
+      for Item of Value loop
+         Raw (K) := Interfaces.C.double (Item);
+         K := K + 1;
+      end loop;
+      Thin.Gaussian_Set_Maximum_Error (F.Raw_Handle, Raw);
+   end Set_Maximum_Error;
+
    procedure Set_Use_Image_Spacing (F : in out Filter; Enabled : Boolean) is
    begin
       Thin.Gaussian_Set_Use_Image_Spacing (F.Raw_Handle, Enabled);
