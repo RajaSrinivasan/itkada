@@ -1,0 +1,11 @@
+/obj/
+/lib/
+/bin/
+/alire/
+/config/
+/itk_paths.gpr
+*.ali
+*.o
+*.so
+*.so.*
+*.a

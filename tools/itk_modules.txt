@@ -1,0 +1,13 @@
+# ITK modules required by the Phase 0 spike.
+# Dependencies (ITKCommon, ITKIOImageBase, ITKConvolution, ITKFFT, and so on)
+# are enabled automatically by ITK's module graph. Listed explicitly so the
+# cache key and find_package() components stay stable.
+# Later phases append modules here (morphology, GDCM, NIfTI, Meta, NRRD).
+ITKCommon
+ITKIOImageBase
+ITKIOPNG
+ITKSmoothing
+ITKThresholding
+ITKImageIntensity
+ITKImageGrid
+ITKImageGradient

@@ -1,0 +1,14 @@
+name = "itklib"
+description = "Ada generic binding for the Insight Toolkit (ITK)"
+version = "0.1.0-dev"
+
+authors = ["RajaSrinivasan"]
+licenses = "Apache-2.0"
+website = "https://github.com/RajaSrinivasan/itkada"
+tags = ["itk", "imaging", "bindings"]
+
+project-files = ["itklib.gpr"]
+
+[[actions]]
+type = "pre-build"
+command = ["bash", "tools/generate_itk_paths.sh"]

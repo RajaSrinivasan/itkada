@@ -1,0 +1,72 @@
+name: Phase 0
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  phase0:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      ITK_PREFIX: /opt/itk-5.4.8
+      ITK_VERSION: "5.4.8"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential cmake ninja-build g++ git curl unzip ca-certificates \
+            libpng-dev zlib1g-dev pkg-config python3
+
+      - name: Install Alire
+        run: |
+          mkdir -p "$HOME/.local"
+          curl -fsSL -o /tmp/alr.zip \
+            https://github.com/alire-project/alire/releases/download/v2.1.1/alr-2.1.1-bin-x86_64-linux.zip
+          unzip -q -o /tmp/alr.zip -d "$HOME/.local"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Cache GNAT toolchain
+        id: gnat-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/alire/toolchains
+          key: alire-2.1.1-gnat-16.1.0-gprbuild-26.0.1-${{ runner.os }}
+
+      - name: Select GNAT and gprbuild
+        run: alr -n toolchain --select gnat_native=16.1.0 gprbuild=26.0.1
+
+      - name: Prepare ITK prefix
+        run: |
+          sudo mkdir -p /opt/itk-5.4.8
+          sudo chown -R "$USER:$USER" /opt/itk-5.4.8
+
+      - name: Cache ITK prefix
+        id: itk-cache
+        uses: actions/cache@v4
+        with:
+          path: /opt/itk-5.4.8
+          key: itk-v5.4.8-${{ runner.os }}-gnat-16.1.0-${{ hashFiles('tools/build_itk.sh', 'tools/itk_modules.txt') }}
+
+      - name: Build ITK 5.4.8
+        if: steps.itk-cache.outputs.cache-hit != 'true'
+        run: |
+          # Same g++ the shim will use, so libstdc++ matches.
+          alr exec -- env ITK_PREFIX=/opt/itk-5.4.8 bash tools/build_itk.sh
+
+      - name: Confirm cached ITK
+        if: steps.itk-cache.outputs.cache-hit == 'true'
+        run: |
+          test -f /opt/itk-5.4.8/lib/cmake/ITK-5.4/ITKConfig.cmake
+          start=$(date +%s)
+          alr exec -- env ITK_DIR=/opt/itk-5.4.8/lib/cmake/ITK-5.4 \
+            bash tools/generate_itk_paths.sh
+          end=$(date +%s)
+          echo "find_package and itk_paths.gpr refreshed in $((end - start))s"
+          grep ITK_Version itk_paths.gpr
+
+      - name: Build itklib and run Phase 0 tests
+        run: bash tools/run_phase0_tests.sh

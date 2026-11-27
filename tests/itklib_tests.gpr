@@ -1,0 +1,13 @@
+with "../itklib.gpr";
+
+project Itklib_Tests is
+   for Main use ("itklib_tests.adb");
+   for Source_Dirs use (".");
+   for Object_Dir use "../obj/tests";
+   for Exec_Dir use "../bin";
+   for Create_Missing_Dirs use "True";
+
+   package Compiler is
+      for Default_Switches ("Ada") use ("-g", "-gnatwa", "-gnat2022");
+   end Compiler;
+end Itklib_Tests;

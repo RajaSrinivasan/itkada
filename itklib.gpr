@@ -1,0 +1,39 @@
+with "config/itklib_config.gpr";
+with "itk_paths.gpr";
+
+library project Itklib is
+   for Library_Name use "itklib";
+   for Library_Version use "libitklib.so." & Itklib_Config.Crate_Version;
+   for Languages use ("Ada", "C++");
+   for Source_Dirs use
+     ("src/ada", "src/ada/generated", "shim", "shim/generated");
+   for Object_Dir use "obj/" & Itklib_Config.Build_Profile;
+   for Create_Missing_Dirs use "True";
+   for Library_Dir use "lib";
+
+   type Library_Type_Type is ("relocatable", "static", "static-pic");
+   Library_Type : Library_Type_Type :=
+     external ("ITKLIB_LIBRARY_TYPE", external ("LIBRARY_TYPE", "relocatable"));
+   for Library_Kind use Library_Type;
+
+   for Library_Options use Itk_Paths.Link_Switches & ("-lstdc++");
+
+   package Naming is
+      for Specification_Suffix ("C++") use ".hh";
+      for Implementation_Suffix ("C++") use ".cxx";
+   end Naming;
+
+   package Compiler is
+      for Default_Switches ("Ada") use
+        Itklib_Config.Ada_Compiler_Switches & ("-gnat2022", "-gnatyN");
+      for Default_Switches ("C++") use
+        ("-std=c++17", "-fPIC", "-g", "-O2", "-Wall", "-Wno-array-bounds")
+        & Itk_Paths.Include_Switches
+        & Itk_Paths.Cxx_Switches;
+      for Driver ("C++") use external ("ITKLIB_CXX", "g++");
+   end Compiler;
+
+   package Binder is
+      for Switches ("Ada") use ("-Es");
+   end Binder;
+end Itklib;
