@@ -4,6 +4,7 @@ with Interfaces.C.Strings;
 package body Itklib.Thin with SPARK_Mode => Off is
 
    use type Interfaces.C.int;
+   use type Interfaces.Unsigned_64;
    use type System.Address;
 
    type Object is null record with Convention => C;
@@ -209,6 +210,113 @@ package body Itklib.Thin with SPARK_Mode => Off is
        Import,
        Convention => C,
        External_Name => "itklib_discrete_gaussian_set_use_image_spacing";
+
+   function itklib_discrete_gaussian_set_maximum_error
+     (Filter : Object_Ptr; Maximum_Error : access constant Interfaces.C.double;
+      Error : access Error_Record) return Interfaces.C.int
+     with
+       Import,
+       Convention => C,
+       External_Name => "itklib_discrete_gaussian_set_maximum_error";
+
+   function itklib_filter_new
+     (Kind : Interfaces.C.int; Pixel : Interfaces.C.int;
+      Dimension : Interfaces.C.unsigned; Out_Object : access Object_Ptr;
+      Error : access Error_Record) return Interfaces.C.int
+     with Import, Convention => C, External_Name => "itklib_filter_new";
+
+   function itklib_median_set_radius
+     (Filter : Object_Ptr; Radius : access constant Interfaces.Unsigned_64;
+      Error : access Error_Record) return Interfaces.C.int
+     with Import, Convention => C, External_Name => "itklib_median_set_radius";
+
+   function itklib_threshold_set
+     (Filter : Object_Ptr; Lower, Upper, Inside_Value, Outside_Value : Interfaces.C.double;
+      Error : access Error_Record) return Interfaces.C.int
+     with Import, Convention => C, External_Name => "itklib_threshold_set";
+
+   function itklib_rescale_set_output_range
+     (Filter : Object_Ptr; Minimum, Maximum : Interfaces.C.double;
+      Error : access Error_Record) return Interfaces.C.int
+     with Import, Convention => C, External_Name => "itklib_rescale_set_output_range";
+
+   function itklib_shrink_set_factors
+     (Filter : Object_Ptr; Factors : access constant Interfaces.Unsigned_64;
+      Error : access Error_Record) return Interfaces.C.int
+     with Import, Convention => C, External_Name => "itklib_shrink_set_factors";
+
+   function itklib_resample_configure
+     (Filter : Object_Ptr; Size : access constant Interfaces.Unsigned_64;
+      Spacing, Origin, Direction : access constant Interfaces.C.double;
+      Default_Pixel : Interfaces.C.double; Error : access Error_Record)
+      return Interfaces.C.int
+     with Import, Convention => C, External_Name => "itklib_resample_configure";
+
+   function itklib_resample_set_uniform_scale
+     (Filter : Object_Ptr; Scale : Interfaces.C.double; Error : access Error_Record)
+      return Interfaces.C.int
+     with Import, Convention => C, External_Name => "itklib_resample_set_uniform_scale";
+
+   function itklib_flip_set_axes
+     (Filter : Object_Ptr; Axes : access constant Interfaces.C.int;
+      About_Origin : Interfaces.C.int; Error : access Error_Record)
+      return Interfaces.C.int
+     with Import, Convention => C, External_Name => "itklib_flip_set_axes";
+
+   function itklib_extract_set_region
+     (Filter : Object_Ptr; Index : access constant Interfaces.Integer_64;
+      Size : access constant Interfaces.Unsigned_64; Error : access Error_Record)
+      return Interfaces.C.int
+     with Import, Convention => C, External_Name => "itklib_extract_set_region";
+
+   function itklib_gradient_set_use_image_spacing
+     (Filter : Object_Ptr; Enabled : Interfaces.C.int; Error : access Error_Record)
+      return Interfaces.C.int
+     with
+       Import, Convention => C, External_Name => "itklib_gradient_set_use_image_spacing";
+
+   function itklib_statistics_get
+     (Filter : Object_Ptr; Minimum, Maximum, Mean : access Interfaces.C.double;
+      Error : access Error_Record) return Interfaces.C.int
+     with Import, Convention => C, External_Name => "itklib_statistics_get";
+
+   function itklib_modified
+     (Process : Object_Ptr; Error : access Error_Record) return Interfaces.C.int
+     with Import, Convention => C, External_Name => "itklib_modified";
+
+   function itklib_update_largest_possible_region
+     (Process : Object_Ptr; Error : access Error_Record) return Interfaces.C.int
+     with
+       Import, Convention => C, External_Name => "itklib_update_largest_possible_region";
+
+   function itklib_set_number_of_work_units
+     (Process : Object_Ptr; Count : Interfaces.C.unsigned; Error : access Error_Record)
+      return Interfaces.C.int
+     with Import, Convention => C, External_Name => "itklib_set_number_of_work_units";
+
+   function itklib_image_buffer_lock
+     (Image : Object_Ptr; Error : access Error_Record) return Interfaces.C.int
+     with Import, Convention => C, External_Name => "itklib_image_buffer_lock";
+
+   function itklib_image_buffer_unlock
+     (Image : Object_Ptr; Error : access Error_Record) return Interfaces.C.int
+     with Import, Convention => C, External_Name => "itklib_image_buffer_unlock";
+
+   function itklib_image_disconnect
+     (Image : Object_Ptr; Error : access Error_Record) return Interfaces.C.int
+     with Import, Convention => C, External_Name => "itklib_image_disconnect";
+
+   function itklib_image_index_to_physical
+     (Image : Object_Ptr; Index : access constant Interfaces.Integer_64;
+      Point : access Interfaces.C.double; Error : access Error_Record)
+      return Interfaces.C.int
+     with Import, Convention => C, External_Name => "itklib_image_index_to_physical";
+
+   function itklib_image_physical_to_index
+     (Image : Object_Ptr; Point : access constant Interfaces.C.double;
+      Index : access Interfaces.Integer_64; Error : access Error_Record)
+      return Interfaces.C.int
+     with Import, Convention => C, External_Name => "itklib_image_physical_to_index";
 
    function itklib_set_input
      (Filter : Object_Ptr; Index : Interfaces.C.unsigned; Image : Object_Ptr;
@@ -550,5 +658,348 @@ package body Itklib.Thin with SPARK_Mode => Off is
       Check (Code, Error);
       return To_Handle (Out_Object);
    end Get_Output;
+
+   function Kind_Id (Kind : Filter_Kind) return Interfaces.C.int is
+   begin
+      case Kind is
+         when Median =>
+            return 1;
+         when Threshold =>
+            return 2;
+         when Rescale =>
+            return 3;
+         when Shrink =>
+            return 4;
+         when Resample =>
+            return 5;
+         when Flip =>
+            return 6;
+         when Extract =>
+            return 7;
+         when Gradient =>
+            return 8;
+         when Statistics =>
+            return 9;
+      end case;
+   end Kind_Id;
+
+   function Filter_New
+     (Kind : Filter_Kind; Pixel : Itklib.Pixel_Kind; Dimension : Positive)
+      return System.Address
+   is
+      Out_Object : aliased Object_Ptr := null;
+      Error : aliased Error_Record;
+      Code : Interfaces.C.int;
+   begin
+      Code :=
+        itklib_filter_new
+          (Kind_Id (Kind), Pixel_Id (Pixel), Interfaces.C.unsigned (Dimension),
+           Out_Object'Unchecked_Access, Error'Unchecked_Access);
+      Check (Code, Error);
+      return To_Handle (Out_Object);
+   end Filter_New;
+
+   procedure Copy_U64 (Source : Extent_Array; Target : out C_U64_Array) is
+   begin
+      for K in Source'Range loop
+         Target (K - Source'First) := Source (K);
+      end loop;
+   end Copy_U64;
+
+   procedure Copy_F64 (Source : Double_Array; Target : out C_F64_Array) is
+   begin
+      for K in Source'Range loop
+         Target (K - Source'First) := Source (K);
+      end loop;
+   end Copy_F64;
+
+   procedure Median_Set_Radius (Handle : System.Address; Radius : Extent_Array) is
+      Raw : C_U64_Array (0 .. Radius'Length - 1);
+      Error : aliased Error_Record;
+      Code : Interfaces.C.int;
+   begin
+      Require (Handle);
+      Copy_U64 (Radius, Raw);
+      Code :=
+        itklib_median_set_radius
+          (To_Pointer (Handle), Raw (0)'Unchecked_Access, Error'Unchecked_Access);
+      Check (Code, Error);
+   end Median_Set_Radius;
+
+   procedure Threshold_Set
+     (Handle : System.Address; Lower, Upper, Inside_Value, Outside_Value : Long_Float)
+   is
+      Error : aliased Error_Record;
+      Code : Interfaces.C.int;
+   begin
+      Require (Handle);
+      Code :=
+        itklib_threshold_set
+          (To_Pointer (Handle), Interfaces.C.double (Lower),
+           Interfaces.C.double (Upper), Interfaces.C.double (Inside_Value),
+           Interfaces.C.double (Outside_Value), Error'Unchecked_Access);
+      Check (Code, Error);
+   end Threshold_Set;
+
+   procedure Rescale_Set_Output_Range
+     (Handle : System.Address; Minimum, Maximum : Long_Float)
+   is
+      Error : aliased Error_Record;
+      Code : Interfaces.C.int;
+   begin
+      Require (Handle);
+      Code :=
+        itklib_rescale_set_output_range
+          (To_Pointer (Handle), Interfaces.C.double (Minimum),
+           Interfaces.C.double (Maximum), Error'Unchecked_Access);
+      Check (Code, Error);
+   end Rescale_Set_Output_Range;
+
+   procedure Shrink_Set_Factors (Handle : System.Address; Factors : Extent_Array) is
+      Raw : C_U64_Array (0 .. Factors'Length - 1);
+      Error : aliased Error_Record;
+      Code : Interfaces.C.int;
+   begin
+      Require (Handle);
+      Copy_U64 (Factors, Raw);
+      Code :=
+        itklib_shrink_set_factors
+          (To_Pointer (Handle), Raw (0)'Unchecked_Access, Error'Unchecked_Access);
+      Check (Code, Error);
+   end Shrink_Set_Factors;
+
+   procedure Resample_Configure
+     (Handle : System.Address; Extent : Extent_Array; Spacing, Origin : Double_Array;
+      Direction : Double_Array; Default_Pixel : Long_Float)
+   is
+      Raw_Size : C_U64_Array (0 .. Extent'Length - 1);
+      Raw_Spacing : C_F64_Array (0 .. Spacing'Length - 1);
+      Raw_Origin : C_F64_Array (0 .. Origin'Length - 1);
+      Raw_Direction : C_F64_Array (0 .. Direction'Length - 1);
+      Error : aliased Error_Record;
+      Code : Interfaces.C.int;
+   begin
+      Require (Handle);
+      Copy_U64 (Extent, Raw_Size);
+      Copy_F64 (Spacing, Raw_Spacing);
+      Copy_F64 (Origin, Raw_Origin);
+      Copy_F64 (Direction, Raw_Direction);
+      Code :=
+        itklib_resample_configure
+          (To_Pointer (Handle), Raw_Size (0)'Unchecked_Access,
+           Raw_Spacing (0)'Unchecked_Access, Raw_Origin (0)'Unchecked_Access,
+           Raw_Direction (0)'Unchecked_Access, Interfaces.C.double (Default_Pixel),
+           Error'Unchecked_Access);
+      Check (Code, Error);
+   end Resample_Configure;
+
+   procedure Resample_Set_Uniform_Scale (Handle : System.Address; Scale : Long_Float) is
+      Error : aliased Error_Record;
+      Code : Interfaces.C.int;
+   begin
+      Require (Handle);
+      Code :=
+        itklib_resample_set_uniform_scale
+          (To_Pointer (Handle), Interfaces.C.double (Scale), Error'Unchecked_Access);
+      Check (Code, Error);
+   end Resample_Set_Uniform_Scale;
+
+   procedure Flip_Set_Axes
+     (Handle : System.Address; Axes : Extent_Array; About_Origin : Boolean)
+   is
+      Raw : array (0 .. Axes'Length - 1) of aliased Interfaces.C.int :=
+        (others => 0);
+      Error : aliased Error_Record;
+      Code : Interfaces.C.int;
+      Flag : Interfaces.C.int := 0;
+   begin
+      Require (Handle);
+      for K in Axes'Range loop
+         if Axes (K) /= Interfaces.Unsigned_64'(0) then
+            Raw (K - Axes'First) := 1;
+         end if;
+      end loop;
+      if About_Origin then
+         Flag := 1;
+      end if;
+      Code :=
+        itklib_flip_set_axes
+          (To_Pointer (Handle), Raw (0)'Unchecked_Access, Flag,
+           Error'Unchecked_Access);
+      Check (Code, Error);
+   end Flip_Set_Axes;
+
+   procedure Extract_Set_Region
+     (Handle : System.Address; Start : Index_Array; Extent : Extent_Array)
+   is
+      Raw_Index : C_I64_Array (0 .. Start'Length - 1);
+      Raw_Size : C_U64_Array (0 .. Extent'Length - 1);
+      Error : aliased Error_Record;
+      Code : Interfaces.C.int;
+   begin
+      Require (Handle);
+      for K in Start'Range loop
+         Raw_Index (K - Start'First) := Start (K);
+      end loop;
+      Copy_U64 (Extent, Raw_Size);
+      Code :=
+        itklib_extract_set_region
+          (To_Pointer (Handle), Raw_Index (0)'Unchecked_Access,
+           Raw_Size (0)'Unchecked_Access, Error'Unchecked_Access);
+      Check (Code, Error);
+   end Extract_Set_Region;
+
+   procedure Gradient_Set_Use_Image_Spacing
+     (Handle : System.Address; Enabled : Boolean)
+   is
+      Error : aliased Error_Record;
+      Code : Interfaces.C.int;
+      Flag : Interfaces.C.int := 0;
+   begin
+      Require (Handle);
+      if Enabled then
+         Flag := 1;
+      end if;
+      Code :=
+        itklib_gradient_set_use_image_spacing
+          (To_Pointer (Handle), Flag, Error'Unchecked_Access);
+      Check (Code, Error);
+   end Gradient_Set_Use_Image_Spacing;
+
+   procedure Statistics_Get
+     (Handle : System.Address; Minimum, Maximum, Mean : out Long_Float)
+   is
+      Raw_Min : aliased Interfaces.C.double := 0.0;
+      Raw_Max : aliased Interfaces.C.double := 0.0;
+      Raw_Mean : aliased Interfaces.C.double := 0.0;
+      Error : aliased Error_Record;
+      Code : Interfaces.C.int;
+   begin
+      Require (Handle);
+      Code :=
+        itklib_statistics_get
+          (To_Pointer (Handle), Raw_Min'Unchecked_Access, Raw_Max'Unchecked_Access,
+           Raw_Mean'Unchecked_Access, Error'Unchecked_Access);
+      Check (Code, Error);
+      Minimum := Long_Float (Raw_Min);
+      Maximum := Long_Float (Raw_Max);
+      Mean := Long_Float (Raw_Mean);
+   end Statistics_Get;
+
+   procedure Modified (Process : System.Address) is
+      Error : aliased Error_Record;
+      Code : Interfaces.C.int;
+   begin
+      Require (Process);
+      Code := itklib_modified (To_Pointer (Process), Error'Unchecked_Access);
+      Check (Code, Error);
+   end Modified;
+
+   procedure Update_Largest_Possible_Region (Process : System.Address) is
+      Error : aliased Error_Record;
+      Code : Interfaces.C.int;
+   begin
+      Require (Process);
+      Code :=
+        itklib_update_largest_possible_region
+          (To_Pointer (Process), Error'Unchecked_Access);
+      Check (Code, Error);
+   end Update_Largest_Possible_Region;
+
+   procedure Set_Number_Of_Work_Units (Process : System.Address; Count : Positive) is
+      Error : aliased Error_Record;
+      Code : Interfaces.C.int;
+   begin
+      Require (Process);
+      Code :=
+        itklib_set_number_of_work_units
+          (To_Pointer (Process), Interfaces.C.unsigned (Count), Error'Unchecked_Access);
+      Check (Code, Error);
+   end Set_Number_Of_Work_Units;
+
+   procedure Gaussian_Set_Maximum_Error
+     (Handle : System.Address; Maximum_Error : Double_Array)
+   is
+      Raw : C_F64_Array (0 .. Maximum_Error'Length - 1);
+      Error : aliased Error_Record;
+      Code : Interfaces.C.int;
+   begin
+      Require (Handle);
+      Copy_F64 (Maximum_Error, Raw);
+      Code :=
+        itklib_discrete_gaussian_set_maximum_error
+          (To_Pointer (Handle), Raw (0)'Unchecked_Access, Error'Unchecked_Access);
+      Check (Code, Error);
+   end Gaussian_Set_Maximum_Error;
+
+   procedure Image_Buffer_Lock (Handle : System.Address) is
+      Error : aliased Error_Record;
+      Code : Interfaces.C.int;
+   begin
+      Require (Handle);
+      Code := itklib_image_buffer_lock (To_Pointer (Handle), Error'Unchecked_Access);
+      Check (Code, Error);
+   end Image_Buffer_Lock;
+
+   procedure Image_Buffer_Unlock (Handle : System.Address) is
+      Error : aliased Error_Record;
+      Code : Interfaces.C.int;
+   begin
+      Require (Handle);
+      Code :=
+        itklib_image_buffer_unlock (To_Pointer (Handle), Error'Unchecked_Access);
+      Check (Code, Error);
+   end Image_Buffer_Unlock;
+
+   procedure Image_Disconnect (Handle : System.Address) is
+      Error : aliased Error_Record;
+      Code : Interfaces.C.int;
+   begin
+      Require (Handle);
+      Code := itklib_image_disconnect (To_Pointer (Handle), Error'Unchecked_Access);
+      Check (Code, Error);
+   end Image_Disconnect;
+
+   procedure Image_Index_To_Physical
+     (Handle : System.Address; Index : Index_Array; Point : out Double_Array)
+   is
+      Raw_Index : C_I64_Array (0 .. Index'Length - 1);
+      Raw_Point : C_F64_Array (0 .. Point'Length - 1);
+      Error : aliased Error_Record;
+      Code : Interfaces.C.int;
+   begin
+      Require (Handle);
+      for K in Index'Range loop
+         Raw_Index (K - Index'First) := Index (K);
+      end loop;
+      Code :=
+        itklib_image_index_to_physical
+          (To_Pointer (Handle), Raw_Index (0)'Unchecked_Access,
+           Raw_Point (0)'Unchecked_Access, Error'Unchecked_Access);
+      Check (Code, Error);
+      for K in Point'Range loop
+         Point (K) := Raw_Point (K - Point'First);
+      end loop;
+   end Image_Index_To_Physical;
+
+   procedure Image_Physical_To_Index
+     (Handle : System.Address; Point : Double_Array; Index : out Index_Array)
+   is
+      Raw_Point : C_F64_Array (0 .. Point'Length - 1);
+      Raw_Index : C_I64_Array (0 .. Index'Length - 1);
+      Error : aliased Error_Record;
+      Code : Interfaces.C.int;
+   begin
+      Require (Handle);
+      Copy_F64 (Point, Raw_Point);
+      Code :=
+        itklib_image_physical_to_index
+          (To_Pointer (Handle), Raw_Point (0)'Unchecked_Access,
+           Raw_Index (0)'Unchecked_Access, Error'Unchecked_Access);
+      Check (Code, Error);
+      for K in Index'Range loop
+         Index (K) := Raw_Index (K - Index'First);
+      end loop;
+   end Image_Physical_To_Index;
 
 end Itklib.Thin;

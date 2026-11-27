@@ -140,3 +140,37 @@ itklib_discrete_gaussian_set_use_image_spacing (itklib_object * filter,
       }
   });
 }
+
+extern "C" int
+itklib_discrete_gaussian_set_maximum_error (itklib_object * filter,
+                                            const double * maximum_error,
+                                            itklib_error * error)
+{
+  return itklib_guard (error, [&] {
+    if (filter == nullptr || maximum_error == nullptr)
+      {
+        throw itklib_status{ITKLIB_E_NULL, "null maximum-error arguments",
+                            "itklib_discrete_gaussian_set_maximum_error"};
+      }
+    if (filter->dim == 2)
+      {
+        auto * concrete = as_gaussian<2> (filter);
+        if (concrete == nullptr)
+          {
+            throw itklib_status{ITKLIB_E_ARG, "handle is not a UInt16 gaussian",
+                                "itklib_discrete_gaussian_set_maximum_error"};
+          }
+        concrete->SetMaximumError (maximum_error);
+      }
+    else
+      {
+        auto * concrete = as_gaussian<3> (filter);
+        if (concrete == nullptr)
+          {
+            throw itklib_status{ITKLIB_E_ARG, "handle is not a UInt16 gaussian",
+                                "itklib_discrete_gaussian_set_maximum_error"};
+          }
+        concrete->SetMaximumError (maximum_error);
+      }
+  });
+}

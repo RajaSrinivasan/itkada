@@ -10,6 +10,7 @@ package Itklib.Filters.Smoothing.Discrete_Gaussian with SPARK_Mode => Off is
    function Create return Filter;
    procedure Set_Input (F : in out Filter; Image : Input.Image);
    procedure Set_Variance (F : in out Filter; Value : Input.Vector);
+   procedure Set_Maximum_Error (F : in out Filter; Value : Input.Vector);
    procedure Set_Use_Image_Spacing (F : in out Filter; Enabled : Boolean);
    function Get_Output (F : Filter) return Output.Image;
 

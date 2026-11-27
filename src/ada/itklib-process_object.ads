@@ -9,6 +9,9 @@ package Itklib.Process_Object with SPARK_Mode => Off is
    type Object is abstract tagged limited private;
 
    procedure Update (Self : in out Object);
+   procedure Modified (Self : in out Object);
+   procedure Update_Largest_Possible_Region (Self : in out Object);
+   procedure Set_Number_Of_Work_Units (Self : in out Object; Count : Positive);
    function Reference_Count (Self : Object) return Natural;
 
    --  Binding support used by the generic filter packages.

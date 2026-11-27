@@ -1,3 +1,4 @@
 package Itklib.Filters with SPARK_Mode => Off is
-   --  ITK image-to-image filters. Phase 0 ships Discrete Gaussian.
+   --  Hand-written UInt16 filters for the Phase 1 MVP. Code generation
+   --  replaces these bodies in Phase 2.
 end Itklib.Filters;

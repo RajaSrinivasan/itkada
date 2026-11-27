@@ -1,4 +1,4 @@
-name: Phase 0
+name: itklib
 
 on:
   push:
@@ -19,7 +19,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             build-essential cmake ninja-build g++ git curl unzip ca-certificates \
-            libpng-dev zlib1g-dev pkg-config python3
+            libpng-dev zlib1g-dev pkg-config python3 python3-pip python3-venv
 
       - name: Install Alire
         run: |
@@ -68,5 +68,8 @@ jobs:
           echo "find_package and itk_paths.gpr refreshed in $((end - start))s"
           grep ITK_Version itk_paths.gpr
 
-      - name: Build itklib and run Phase 0 tests
-        run: bash tools/run_phase0_tests.sh
+      - name: Install SimpleITK and ITK Python
+        run: python3 -m pip install --user SimpleITK itk
+
+      - name: Build itklib, test, prove, and compare with SimpleITK
+        run: bash tools/run_phase1_tests.sh

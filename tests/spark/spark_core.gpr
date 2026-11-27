@@ -1,0 +1,17 @@
+project Spark_Core is
+   for Source_Dirs use ("../../src/ada", ".");
+   for Source_Files use
+     ("itklib.ads", "itklib-pixel_signature.ads", "itklib-core.ads",
+      "itklib-core-regions.ads", "itklib-core-regions.adb",
+      "proof_instances.ads", "proof_instances.adb");
+   for Object_Dir use "../../obj/spark";
+   for Create_Missing_Dirs use "True";
+
+   package Compiler is
+      for Default_Switches ("Ada") use ("-gnat2022");
+   end Compiler;
+
+   package Prove is
+      for Proof_Switches ("Ada") use ("--mode=silver", "--level=2");
+   end Prove;
+end Spark_Core;

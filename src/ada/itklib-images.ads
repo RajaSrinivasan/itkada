@@ -1,5 +1,6 @@
 with Ada.Finalization;
 with Interfaces;
+with Itklib.Core.Regions;
 with Itklib.Pixel_Signature;
 with System;
 
@@ -10,21 +11,21 @@ package Itklib.Images with SPARK_Mode => Off is
    --  itk::Image<TPixel, VImageDimension>. The handle is a controlled
    --  reference: copying it calls Register, and finalizing calls
    --  UnRegister. The buffer is the ITK buffer (x varies fastest).
+   --  Index, size, and region arithmetic is Itklib.Core.Regions, which
+   --  is SPARK. This package itself calls C, so it stays SPARK_Mode Off.
 
    subtype Pixel is Sig.Pixel_Type;
    Pixel_Kind_Id : constant Itklib.Pixel_Kind := Sig.Pixel_Kind_Id;
    Image_Dimension : constant Positive := Dimension;
 
-   subtype Axis is Positive range 1 .. Dimension;
+   package Regions is new Itklib.Core.Regions (Dimension);
 
-   type Index is array (Axis) of Interfaces.Integer_64;
-   type Size is array (Axis) of Interfaces.Unsigned_64;
-   type Vector is array (Axis) of Long_Float;
-   type Direction is array (Axis, Axis) of Long_Float;
-   type Region is record
-      Start : Index;
-      Extent : Size;
-   end record;
+   subtype Axis is Regions.Axis;
+   subtype Index is Regions.Index;
+   subtype Size is Regions.Size;
+   subtype Vector is Regions.Vector;
+   subtype Direction is Regions.Matrix;
+   subtype Region is Regions.Region;
 
    type Image is tagged private;
 
@@ -39,8 +40,20 @@ package Itklib.Images with SPARK_Mode => Off is
    procedure Set_Origin (Img : in out Image; Value : Vector);
    procedure Set_Direction (Img : in out Image; Value : Direction);
 
-   --  Zero-copy view of GetBufferPointer. The view is valid only for
-   --  the call, and only until the next Update that reallocates.
+   --  ITK index is absolute. physical = origin + direction * (spacing .* index).
+   function Transform_Index_To_Physical_Point
+     (Img : Image; Idx : Index) return Vector;
+   function Transform_Physical_Point_To_Index
+     (Img : Image; Point : Vector) return Index;
+
+   --  Drop the pipeline source. The pixel buffer stays with this handle.
+   --  Other Ada copies may still anchor the producer until they finalize.
+   procedure Disconnect_Pipeline (Img : in out Image);
+
+   --  Zero-copy view of GetBufferPointer. The view is valid only inside
+   --  Process. A lock is held for that call; Update of a filter whose
+   --  output is this image raises Itk_Error while the view is active.
+   --  Do not keep the array after Process returns. x varies fastest.
    type Pixel_Array is array (Interfaces.Unsigned_64 range <>) of aliased Pixel
      with Convention => C;
 
