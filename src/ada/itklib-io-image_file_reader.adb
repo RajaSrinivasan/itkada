@@ -1,3 +1,4 @@
+with Itklib.Supported;
 with Itklib.Thin;
 
 package body Itklib.IO.Image_File_Reader with SPARK_Mode => Off is
@@ -21,8 +22,12 @@ package body Itklib.IO.Image_File_Reader with SPARK_Mode => Off is
    end Get_Output;
 
 begin
-   if not Thin.Is_Supported (Img.Pixel_Kind_Id, Img.Image_Dimension) then
+   if not Itklib.Supported.Image_Built (Img.Pixel_Kind_Id, Img.Image_Dimension) then
       raise Unsupported_Instantiation
         with "PNG reader is not built for this pixel kind and dimension";
+   end if;
+   if not Thin.Is_Supported (Img.Pixel_Kind_Id, Img.Image_Dimension) then
+      raise Unsupported_Instantiation
+        with "Ada Supported and itklib_supported disagree";
    end if;
 end Itklib.IO.Image_File_Reader;

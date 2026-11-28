@@ -1,0 +1,5 @@
+# Default pre-built instantiations. UInt16 in 2D and 3D ships in the crate.
+# tools/add_pixel_type.py appends other pixels; it does not edit this comment.
+dimensions: [2, 3]
+pixels:
+  - uint16

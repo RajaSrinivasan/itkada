@@ -36,4 +36,20 @@ library project Itklib is
    package Binder is
       for Switches ("Ada") use ("-Es");
    end Binder;
+
+   -- BEGIN GENERATED SOURCES
+   -- shim/generated/discrete_gaussian.cxx
+   -- shim/generated/itklib_builtin.hpp
+   -- shim/generated/itklib_classes.inc
+   -- shim/generated/itklib_filters.h
+   -- shim/generated/itklib_supported.cxx
+   -- src/ada/generated/itklib-filters-smoothing-discrete_gaussian.adb
+   -- src/ada/generated/itklib-filters-smoothing-discrete_gaussian.ads
+   -- src/ada/generated/itklib-instances-uint16.ads
+   -- src/ada/generated/itklib-instances.ads
+   -- src/ada/generated/itklib-supported.adb
+   -- src/ada/generated/itklib-supported.ads
+   -- src/ada/generated/itklib-thin-generated.adb
+   -- src/ada/generated/itklib-thin-generated.ads
+   -- END GENERATED SOURCES
 end Itklib;

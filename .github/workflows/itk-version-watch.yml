@@ -13,12 +13,18 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - name: Compare ITK tag and apt
+      - uses: actions/checkout@v4
+
+      - name: Compare ITK tag and apt with the pin
         run: |
-          tag=$(curl -fsSL https://api.github.com/repos/InsightSoftwareConsortium/ITK/releases?per_page=20 \
+          pin=$(sed -n 's/^VERSION="\${ITK_VERSION:-\(.*\)}".*/\1/p' tools/build_itk.sh)
+          echo "pinned version: ${pin}"
+          tag=$(curl -fsSL https://api.github.com/repos/InsightSoftwareConsortium/ITK/releases?per_page=30 \
             | python3 -c 'import json,sys,re
           rels=json.load(sys.stdin)
           for rel in rels:
+              if rel.get("prerelease"):
+                  continue
               name=rel.get("tag_name","")
               if re.fullmatch(r"v[0-9]+(\.[0-9]+)+", name):
                   print(name)
@@ -26,4 +32,43 @@ jobs:
           ')
           echo "newest stable tag: ${tag:-unknown}"
           apt-cache policy libinsighttoolkit5-dev || true
-          echo "itklib still pins 5.4.8 until a bump PR updates tools/build_itk.sh"
+          apt_ver=$(apt-cache policy libinsighttoolkit5-dev 2>/dev/null | awk '/Candidate:/ {print $2; exit}')
+          echo "apt candidate: ${apt_ver:-none}"
+          python3 - "$pin" "${tag#v}" "${apt_ver:-0}" << 'PY'
+          import sys
+          def parse(text):
+              nums = []
+              for part in text.replace(":", ".").split("."):
+                  digits = "".join(ch for ch in part if ch.isdigit())
+                  if digits:
+                      nums.append(int(digits))
+                  else:
+                      break
+              return tuple(nums)
+          pin, tag, apt = (parse(sys.argv[i]) for i in range(1, 4))
+          newer = []
+          if tag > pin:
+              newer.append(f"git tag {tag} is newer than pin {pin}")
+          if apt > pin and apt != (0,):
+              newer.append(f"apt {apt} is newer than pin {pin}")
+          if newer:
+              print("ITK pin is behind:")
+              print("\n".join(newer))
+              sys.exit(1)
+          print("pin matches the newest public ITK this job can see")
+          PY
+
+  beta:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Report the newest ITK prerelease
+        run: |
+          python3 - << 'PY'
+          import json, re, urllib.request
+          rels = json.load(urllib.request.urlopen(
+              "https://api.github.com/repos/InsightSoftwareConsortium/ITK/releases?per_page=30"))
+          beta = next((rel.get("tag_name") for rel in rels if rel.get("prerelease")), None)
+          print(f"newest prerelease: {beta or 'none'}")
+          print("The shim targets ITK 5. A 6.0 prerelease stays off the blocking build.")
+          PY

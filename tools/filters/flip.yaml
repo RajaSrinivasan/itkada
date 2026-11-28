@@ -1,0 +1,14 @@
+name: Flip
+id: 7
+ada_package: Itklib.Filters.Image_Grid.Flip
+pixel_category: scalar
+output: same
+formal: single
+generate_sources: false
+pixels: [uint16]
+dimensions: [2, 3]
+manual_reason: "Hand-written UInt16 shim. add_pixel_type.py does not extend it."
+brief: itk::FlipImageFilter. Flip about the origin by default.
+adaimg:
+  option: flip
+  help: "-flip x|y            flip that axis (ITK origin follows the pixels)"

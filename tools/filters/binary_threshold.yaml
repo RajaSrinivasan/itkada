@@ -1,0 +1,14 @@
+name: BinaryThreshold
+id: 3
+ada_package: Itklib.Filters.Thresholding.Binary_Threshold
+pixel_category: scalar
+output: same
+formal: pair
+generate_sources: false
+pixels: [uint16]
+dimensions: [2, 3]
+manual_reason: "Hand-written UInt16 shim. add_pixel_type.py does not extend it."
+brief: itk::BinaryThresholdImageFilter. Inclusive lower and upper bounds.
+adaimg:
+  option: threshold
+  help: "-threshold lo:hi     inside 65535, outside 0"

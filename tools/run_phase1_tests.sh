@@ -14,6 +14,9 @@ export LD_LIBRARY_PATH="${ROOT}/lib:${ITK_LIB}:${LIBSTD}${LD_LIBRARY_PATH:+:${LD
 
 ./bin/phase1_tests
 
+alr exec -- gprbuild -p -P tests/generated_tests.gpr
+./bin/generated_tests
+
 SMOKE="${ROOT}/obj/phase1-smoke"
 mkdir -p "${SMOKE}"
 IN="${ROOT}/obj/phase0-uint16.png"

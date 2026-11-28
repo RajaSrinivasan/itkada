@@ -40,8 +40,11 @@ begin
       raise Unsupported_Instantiation with
         "Median requires matching input and output images";
    end if;
-   if not Thin.Is_Supported (Input.Pixel_Kind_Id, Input.Image_Dimension) then
+   if not Itklib.Supported.Agrees
+     (Itklib.Supported.Median, Input.Pixel_Kind_Id, Input.Pixel_Kind_Id,
+      Input.Image_Dimension)
+   then
       raise Unsupported_Instantiation with
-        "Median is not built for this pixel kind and dimension";
+        "Median Ada support and the C table disagree";
    end if;
 end Itklib.Filters.Smoothing.Median;

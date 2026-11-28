@@ -1,10 +1,18 @@
 with Itklib.Images;
 with Itklib.Process_Object;
+with Itklib.Supported;
 
 generic
    with package Input is new Itklib.Images (<>);
    with package Output is new Itklib.Images (<>);
 package Itklib.Filters.Image_Gradient.Gradient_Magnitude with SPARK_Mode => Off is
+   pragma Compile_Time_Error
+     (Input.Pixel_Kind_Id /= Output.Pixel_Kind_Id
+      or else Input.Image_Dimension /= Output.Image_Dimension
+      or else not Itklib.Supported.GradientMagnitude
+        (Input.Pixel_Kind_Id, Input.Image_Dimension),
+      "GradientMagnitude is not built for this pixel kind and dimension");
+
    --  itk::GradientMagnitudeImageFilter with UInt16 output so the result
    --  can be written as PNG. Canny and other real-valued edge detectors
    --  wait for a generated float32 pixel type. adaimg -edge uses this

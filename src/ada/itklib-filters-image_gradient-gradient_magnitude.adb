@@ -33,8 +33,11 @@ begin
       raise Unsupported_Instantiation with
         "GradientMagnitude requires matching input and output images";
    end if;
-   if not Thin.Is_Supported (Input.Pixel_Kind_Id, Input.Image_Dimension) then
+   if not Itklib.Supported.Agrees
+     (Itklib.Supported.GradientMagnitude, Input.Pixel_Kind_Id, Input.Pixel_Kind_Id,
+      Input.Image_Dimension)
+   then
       raise Unsupported_Instantiation with
-        "GradientMagnitude is not built for this pixel kind and dimension";
+        "GradientMagnitude Ada support and the C table disagree";
    end if;
 end Itklib.Filters.Image_Gradient.Gradient_Magnitude;
