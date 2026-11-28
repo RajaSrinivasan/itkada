@@ -6,6 +6,10 @@ with Adaimg_Command;
 with Interfaces;
 with Itklib.Filters.Image_Gradient.Gradient_Magnitude;
 with Itklib.Filters.Image_Grid.Extract;
+with Itklib.Filters.Morphology.Grayscale_Dilate;
+with Itklib.Filters.Morphology.Grayscale_Erode;
+with Itklib.Filters.Region_Growing.Connected_Threshold;
+with Itklib.Filters.Thresholding.Otsu_Threshold;
 with Itklib.Filters.Image_Grid.Flip;
 with Itklib.Filters.Image_Grid.Resample;
 with Itklib.Filters.Image_Grid.Shrink;
@@ -36,6 +40,10 @@ procedure Adaimg is
    package Flip is new Itklib.Filters.Image_Grid.Flip (Img);
    package Crop is new Itklib.Filters.Image_Grid.Extract (Img, Img);
    package Edge is new Itklib.Filters.Image_Gradient.Gradient_Magnitude (Img, Img);
+   package Erode is new Itklib.Filters.Morphology.Grayscale_Erode (Img, Img);
+   package Dilate is new Itklib.Filters.Morphology.Grayscale_Dilate (Img, Img);
+   package Otsu is new Itklib.Filters.Thresholding.Otsu_Threshold (Img, Img);
+   package Grow is new Itklib.Filters.Region_Growing.Connected_Threshold (Img, Img);
 
    function Apply
      (Op : Adaimg_Command.Operation; Current : Img.Image) return Img.Image
@@ -131,6 +139,48 @@ procedure Adaimg is
                F.Set_Input (Current);
                return F.Get_Output;
             end;
+         when Adaimg_Command.Erode =>
+            declare
+               F : Erode.Filter := Erode.Create;
+            begin
+               F.Set_Input (Current);
+               F.Set_Radius ((Op.Radius, Op.Radius));
+               return F.Get_Output;
+            end;
+         when Adaimg_Command.Dilate =>
+            declare
+               F : Dilate.Filter := Dilate.Create;
+            begin
+               F.Set_Input (Current);
+               F.Set_Radius ((Op.Radius, Op.Radius));
+               return F.Get_Output;
+            end;
+         when Adaimg_Command.Otsu =>
+            declare
+               F : Otsu.Filter := Otsu.Create;
+            begin
+               F.Set_Input (Current);
+               F.Set_Inside_Value (65_535.0);
+               F.Set_Outside_Value (0.0);
+               return F.Get_Output;
+            end;
+         when Adaimg_Command.Grow =>
+            declare
+               F : Grow.Filter := Grow.Create;
+               Seed : constant Img.Index :=
+                 (Interfaces.Integer_64 (Op.Seed_X),
+                  Interfaces.Integer_64 (Op.Seed_Y));
+            begin
+               F.Set_Input (Current);
+               F.Set_Lower (Op.Low);
+               F.Set_Upper (Op.High);
+               F.Set_Replace_Value (65_535.0);
+               F.Set_Seed (Seed);
+               return F.Get_Output;
+            end;
+         when Adaimg_Command.Canny =>
+            raise Itklib.Itk_Error with
+              "Canny needs float32. Run tools/add_pixel_type.py --pixel float32 --dims 2,3 and rebuild.";
       end case;
    end Apply;
 

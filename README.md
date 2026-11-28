@@ -151,7 +151,12 @@ and mean. Spacing has no unit: PNG does not carry ITK's spatial units.
 | `-resize N%` | `Shrink` or `Resample` | see below |
 | `-flip x` or `-flip y` | `Flip` | ITK also moves the origin (`FlipAboutOrigin` true) |
 | `-crop WxH+X+Y` | `Extract` | index `(X,Y)`, size `(W,H)`, origin 0. `+` only |
-| `-edge` | `Gradient_Magnitude` | UInt16 magnitude. Canny needs float32 and is not in this phase |
+| `-edge` | `Gradient_Magnitude` | UInt16 magnitude |
+| `-erode r` | `Grayscale_Erode` | ball radius on x and y |
+| `-dilate r` | `Grayscale_Dilate` | ball radius on x and y |
+| `-otsu` | `Otsu_Threshold` | inside 65535, outside 0 |
+| `-grow x,y,lo:hi` | `Connected_Threshold` | seed `(x,y)`, inclusive bounds, replace 65535 |
+| `-canny sigma` | `Canny_Edge_Detection` | float32 only; not in the pre-built matrix |
 
 `-resize`: `N` is a positive integer. `100%` copies the image. If `N < 100`
 and `100` is divisible by `N`, the image is shrunk by `100/N` on each axis
@@ -163,8 +168,18 @@ divided by the same scale. The scale is applied when `Update` runs, so the
 reader does not have to execute early.
 
 `-edge` is gradient magnitude cast to `UInt16`, so the PNG writer needs no
-cast. Canny and other real-valued edge detectors wait for
-`tools/add_pixel_type.py --pixel float32` in a later phase.
+cast. `-canny` is the real-valued detector and needs
+`tools/add_pixel_type.py --pixel float32 --dims 2,3` before it can run;
+the default UInt16 build prints that requirement and exits 1.
+
+Phase 3 adds grayscale and binary morphology, Otsu, connected and
+confidence region growing, cast, intensity windowing, sigmoid, invert,
+and mean on the pre-built UInt16 matrix. Canny and both anisotropic
+diffusion filters are `real_only`: the packages are generated, and they
+become usable after float32 is added. CT data is often signed; add
+`--pixel int16` the same way when a signed matrix is needed. DICOM I/O
+stays in phase 4.
+
 
 A missing file or an unknown option exits with status 1 and a message on
 stderr. `adaimg -h` prints the usage and exits 0.

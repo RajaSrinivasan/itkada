@@ -39,6 +39,63 @@ itklib_filter_supported (int filter_id, int input_pixel, int output_pixel,
     case 10:
       if (input != output) { return 0; }
       return (input == ITKLIB_UINT16 && (dimension == 2 || dimension == 3)) ? 1 : 0;
+    case 11:
+      if (input != output) { return 0; }
+      return (input == ITKLIB_UINT16 && (dimension == 2 || dimension == 3)) ? 1 : 0;
+    case 12:
+      if (input != output) { return 0; }
+      return (input == ITKLIB_UINT16 && (dimension == 2 || dimension == 3)) ? 1 : 0;
+    case 13:
+      if (input != output) { return 0; }
+      return (input == ITKLIB_UINT16 && (dimension == 2 || dimension == 3)) ? 1 : 0;
+    case 14:
+      if (input != output) { return 0; }
+      return (input == ITKLIB_UINT16 && (dimension == 2 || dimension == 3)) ? 1 : 0;
+    case 15:
+      if (input != output) { return 0; }
+      return (input == ITKLIB_UINT16 && (dimension == 2 || dimension == 3)) ? 1 : 0;
+    case 16:
+      if (input != output) { return 0; }
+      return (input == ITKLIB_UINT16 && (dimension == 2 || dimension == 3)) ? 1 : 0;
+    case 17:
+      if (input != output) { return 0; }
+      return (input == ITKLIB_UINT16 && (dimension == 2 || dimension == 3)) ? 1 : 0;
+    case 18:
+      if (input != output) { return 0; }
+      return (input == ITKLIB_UINT16 && (dimension == 2 || dimension == 3)) ? 1 : 0;
+    case 19:
+      if (input != output) { return 0; }
+      return (input == ITKLIB_UINT16 && (dimension == 2 || dimension == 3)) ? 1 : 0;
+    case 20:
+      if (input != output) { return 0; }
+      return (input == ITKLIB_UINT16 && (dimension == 2 || dimension == 3)) ? 1 : 0;
+    case 21:
+      if (input != output) { return 0; }
+      return (input == ITKLIB_UINT16 && (dimension == 2 || dimension == 3)) ? 1 : 0;
+    case 22:
+      if (input != output) { return 0; }
+      return (input == ITKLIB_UINT16 && (dimension == 2 || dimension == 3)) ? 1 : 0;
+    case 23:
+      return itklib_pixel_dim_built (input, dimension)
+             && itklib_pixel_dim_built (output, dimension) ? 1 : 0;
+    case 24:
+      return 0;
+    case 25:
+      return 0;
+    case 26:
+      return 0;
+    case 27:
+      if (input != output) { return 0; }
+      return (input == ITKLIB_UINT16 && (dimension == 2 || dimension == 3)) ? 1 : 0;
+    case 28:
+      if (input != output) { return 0; }
+      return (input == ITKLIB_UINT16 && (dimension == 2 || dimension == 3)) ? 1 : 0;
+    case 29:
+      if (input != output) { return 0; }
+      return (input == ITKLIB_UINT16 && (dimension == 2 || dimension == 3)) ? 1 : 0;
+    case 30:
+      if (input != output) { return 0; }
+      return (input == ITKLIB_UINT16 && (dimension == 2 || dimension == 3)) ? 1 : 0;
     default:
       return 0;
     }

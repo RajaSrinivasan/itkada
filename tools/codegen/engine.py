@@ -82,9 +82,8 @@ def load_filters(root: Path = ROOT) -> list[dict]:
         item.setdefault("output", "same")
         item.setdefault("formal", "pair")
         item.setdefault("generate_sources", True)
+        item.setdefault("itk_arity", 1 if item.get("output") == "none" else int(item.get("itk_arity", 2)))
         item.setdefault("kernel", "flat" if item.get("structuring_element") == "ball" else "none")
-        if item.get("structuring_element") == "ball":
-            item["kernel"] = "flat"
         filters.append(item)
     filters.sort(key=lambda item: int(item["id"]))
     return filters
@@ -1242,8 +1241,6 @@ def parents_needed(units: list[str], root: Path) -> dict[str, str]:
             parent = ".".join(parts[:index])
             filename = unit_file(parent, ".ads")
             if (root / "src" / "ada" / filename).exists():
-                continue
-            if (root / "src" / "ada" / "generated" / filename).exists() and filename not in files:
                 continue
             rel = f"src/ada/generated/{filename}"
             if rel not in files:

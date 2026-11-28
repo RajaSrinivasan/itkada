@@ -4,3 +4,92 @@ int itklib_discrete_gaussian_new (itklib_pixel_id input_pixel, itklib_pixel_id o
 int itklib_discrete_gaussian_set_variance (itklib_object * filter, const double * values, itklib_error * error);
 int itklib_discrete_gaussian_set_maximum_error (itklib_object * filter, const double * values, itklib_error * error);
 int itklib_discrete_gaussian_set_use_image_spacing (itklib_object * filter, int enabled, itklib_error * error);
+int itklib_grayscale_erode_new (itklib_pixel_id input_pixel, itklib_pixel_id output_pixel,
+    unsigned dimension, itklib_object ** out, itklib_error * error);
+int itklib_grayscale_erode_set_radius (itklib_object * filter, const uint64_t * values, itklib_error * error);
+int itklib_grayscale_dilate_new (itklib_pixel_id input_pixel, itklib_pixel_id output_pixel,
+    unsigned dimension, itklib_object ** out, itklib_error * error);
+int itklib_grayscale_dilate_set_radius (itklib_object * filter, const uint64_t * values, itklib_error * error);
+int itklib_grayscale_morphological_opening_new (itklib_pixel_id input_pixel, itklib_pixel_id output_pixel,
+    unsigned dimension, itklib_object ** out, itklib_error * error);
+int itklib_grayscale_morphological_opening_set_radius (itklib_object * filter, const uint64_t * values, itklib_error * error);
+int itklib_grayscale_morphological_closing_new (itklib_pixel_id input_pixel, itklib_pixel_id output_pixel,
+    unsigned dimension, itklib_object ** out, itklib_error * error);
+int itklib_grayscale_morphological_closing_set_radius (itklib_object * filter, const uint64_t * values, itklib_error * error);
+int itklib_binary_erode_new (itklib_pixel_id input_pixel, itklib_pixel_id output_pixel,
+    unsigned dimension, itklib_object ** out, itklib_error * error);
+int itklib_binary_erode_set_radius (itklib_object * filter, const uint64_t * values, itklib_error * error);
+int itklib_binary_erode_set_foreground_value (itklib_object * filter, double value, itklib_error * error);
+int itklib_binary_erode_set_background_value (itklib_object * filter, double value, itklib_error * error);
+int itklib_binary_dilate_new (itklib_pixel_id input_pixel, itklib_pixel_id output_pixel,
+    unsigned dimension, itklib_object ** out, itklib_error * error);
+int itklib_binary_dilate_set_radius (itklib_object * filter, const uint64_t * values, itklib_error * error);
+int itklib_binary_dilate_set_foreground_value (itklib_object * filter, double value, itklib_error * error);
+int itklib_binary_dilate_set_background_value (itklib_object * filter, double value, itklib_error * error);
+int itklib_binary_morphological_opening_new (itklib_pixel_id input_pixel, itklib_pixel_id output_pixel,
+    unsigned dimension, itklib_object ** out, itklib_error * error);
+int itklib_binary_morphological_opening_set_radius (itklib_object * filter, const uint64_t * values, itklib_error * error);
+int itklib_binary_morphological_opening_set_foreground_value (itklib_object * filter, double value, itklib_error * error);
+int itklib_binary_morphological_closing_new (itklib_pixel_id input_pixel, itklib_pixel_id output_pixel,
+    unsigned dimension, itklib_object ** out, itklib_error * error);
+int itklib_binary_morphological_closing_set_radius (itklib_object * filter, const uint64_t * values, itklib_error * error);
+int itklib_binary_morphological_closing_set_foreground_value (itklib_object * filter, double value, itklib_error * error);
+int itklib_binary_fillhole_new (itklib_pixel_id input_pixel, itklib_pixel_id output_pixel,
+    unsigned dimension, itklib_object ** out, itklib_error * error);
+int itklib_binary_fillhole_set_foreground_value (itklib_object * filter, double value, itklib_error * error);
+int itklib_binary_fillhole_set_fully_connected (itklib_object * filter, int enabled, itklib_error * error);
+int itklib_otsu_threshold_new (itklib_pixel_id input_pixel, itklib_pixel_id output_pixel,
+    unsigned dimension, itklib_object ** out, itklib_error * error);
+int itklib_otsu_threshold_set_inside_value (itklib_object * filter, double value, itklib_error * error);
+int itklib_otsu_threshold_set_outside_value (itklib_object * filter, double value, itklib_error * error);
+int itklib_otsu_threshold_set_number_of_histogram_bins (itklib_object * filter, unsigned value, itklib_error * error);
+int itklib_otsu_threshold_threshold (itklib_object * filter, double * value, itklib_error * error);
+int itklib_connected_threshold_new (itklib_pixel_id input_pixel, itklib_pixel_id output_pixel,
+    unsigned dimension, itklib_object ** out, itklib_error * error);
+int itklib_connected_threshold_set_lower (itklib_object * filter, double value, itklib_error * error);
+int itklib_connected_threshold_set_upper (itklib_object * filter, double value, itklib_error * error);
+int itklib_connected_threshold_set_replace_value (itklib_object * filter, double value, itklib_error * error);
+int itklib_connected_threshold_set_seed (itklib_object * filter, const int64_t * values, itklib_error * error);
+int itklib_connected_threshold_add_seed (itklib_object * filter, const int64_t * values, itklib_error * error);
+int itklib_confidence_connected_new (itklib_pixel_id input_pixel, itklib_pixel_id output_pixel,
+    unsigned dimension, itklib_object ** out, itklib_error * error);
+int itklib_confidence_connected_set_multiplier (itklib_object * filter, double value, itklib_error * error);
+int itklib_confidence_connected_set_number_of_iterations (itklib_object * filter, unsigned value, itklib_error * error);
+int itklib_confidence_connected_set_initial_neighborhood_radius (itklib_object * filter, unsigned value, itklib_error * error);
+int itklib_confidence_connected_set_replace_value (itklib_object * filter, double value, itklib_error * error);
+int itklib_confidence_connected_set_seed (itklib_object * filter, const int64_t * values, itklib_error * error);
+int itklib_cast_new (itklib_pixel_id input_pixel, itklib_pixel_id output_pixel,
+    unsigned dimension, itklib_object ** out, itklib_error * error);
+int itklib_canny_edge_detection_new (itklib_pixel_id input_pixel, itklib_pixel_id output_pixel,
+    unsigned dimension, itklib_object ** out, itklib_error * error);
+int itklib_canny_edge_detection_set_variance (itklib_object * filter, const double * values, itklib_error * error);
+int itklib_canny_edge_detection_set_upper_threshold (itklib_object * filter, double value, itklib_error * error);
+int itklib_canny_edge_detection_set_lower_threshold (itklib_object * filter, double value, itklib_error * error);
+int itklib_curvature_anisotropic_diffusion_new (itklib_pixel_id input_pixel, itklib_pixel_id output_pixel,
+    unsigned dimension, itklib_object ** out, itklib_error * error);
+int itklib_curvature_anisotropic_diffusion_set_time_step (itklib_object * filter, double value, itklib_error * error);
+int itklib_curvature_anisotropic_diffusion_set_number_of_iterations (itklib_object * filter, unsigned value, itklib_error * error);
+int itklib_curvature_anisotropic_diffusion_set_conductance_parameter (itklib_object * filter, double value, itklib_error * error);
+int itklib_gradient_anisotropic_diffusion_new (itklib_pixel_id input_pixel, itklib_pixel_id output_pixel,
+    unsigned dimension, itklib_object ** out, itklib_error * error);
+int itklib_gradient_anisotropic_diffusion_set_time_step (itklib_object * filter, double value, itklib_error * error);
+int itklib_gradient_anisotropic_diffusion_set_number_of_iterations (itklib_object * filter, unsigned value, itklib_error * error);
+int itklib_gradient_anisotropic_diffusion_set_conductance_parameter (itklib_object * filter, double value, itklib_error * error);
+int itklib_intensity_windowing_new (itklib_pixel_id input_pixel, itklib_pixel_id output_pixel,
+    unsigned dimension, itklib_object ** out, itklib_error * error);
+int itklib_intensity_windowing_set_window_minimum (itklib_object * filter, double value, itklib_error * error);
+int itklib_intensity_windowing_set_window_maximum (itklib_object * filter, double value, itklib_error * error);
+int itklib_intensity_windowing_set_output_minimum (itklib_object * filter, double value, itklib_error * error);
+int itklib_intensity_windowing_set_output_maximum (itklib_object * filter, double value, itklib_error * error);
+int itklib_sigmoid_new (itklib_pixel_id input_pixel, itklib_pixel_id output_pixel,
+    unsigned dimension, itklib_object ** out, itklib_error * error);
+int itklib_sigmoid_set_alpha (itklib_object * filter, double value, itklib_error * error);
+int itklib_sigmoid_set_beta (itklib_object * filter, double value, itklib_error * error);
+int itklib_sigmoid_set_output_minimum (itklib_object * filter, double value, itklib_error * error);
+int itklib_sigmoid_set_output_maximum (itklib_object * filter, double value, itklib_error * error);
+int itklib_invert_intensity_new (itklib_pixel_id input_pixel, itklib_pixel_id output_pixel,
+    unsigned dimension, itklib_object ** out, itklib_error * error);
+int itklib_invert_intensity_set_maximum (itklib_object * filter, double value, itklib_error * error);
+int itklib_mean_new (itklib_pixel_id input_pixel, itklib_pixel_id output_pixel,
+    unsigned dimension, itklib_object ** out, itklib_error * error);
+int itklib_mean_set_radius (itklib_object * filter, const uint64_t * values, itklib_error * error);

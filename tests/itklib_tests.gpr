@@ -1,7 +1,7 @@
 with "../itklib.gpr";
 
 project Itklib_Tests is
-   for Main use ("itklib_tests.adb", "phase1_tests.adb");
+   for Main use ("itklib_tests.adb", "phase1_tests.adb", "phase3_tests.adb");
    for Source_Dirs use (".", "../examples/adaimg");
    for Object_Dir use "../obj/tests";
    for Exec_Dir use "../bin";

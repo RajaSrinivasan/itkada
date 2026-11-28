@@ -1,0 +1,28 @@
+name: CannyEdgeDetection
+id: 24
+itk_class: CannyEdgeDetectionImageFilter
+header: itkCannyEdgeDetectionImageFilter.h
+module: ITKImageFeature
+ada_package: Itklib.Filters.Image_Feature.Canny_Edge_Detection
+pixel_category: real_only
+output: same
+formal: pair
+generate_sources: true
+dimensions: [2, 3]
+brief: itk::CannyEdgeDetectionImageFilter. Real pixels only. adaimg -canny needs a generated float32 build.
+members:
+  - name: Variance
+    itk: SetVariance
+    kind: double_vector
+    ada: Set_Variance
+  - name: UpperThreshold
+    itk: SetUpperThreshold
+    kind: pixel
+    ada: Set_Upper_Threshold
+  - name: LowerThreshold
+    itk: SetLowerThreshold
+    kind: pixel
+    ada: Set_Lower_Threshold
+adaimg:
+  option: canny
+  help: '-canny sigma         Canny edges; requires generated float32'

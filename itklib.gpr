@@ -38,13 +38,76 @@ library project Itklib is
    end Binder;
 
    -- BEGIN GENERATED SOURCES
+   -- shim/generated/binary_dilate.cxx
+   -- shim/generated/binary_erode.cxx
+   -- shim/generated/binary_fillhole.cxx
+   -- shim/generated/binary_morphological_closing.cxx
+   -- shim/generated/binary_morphological_opening.cxx
+   -- shim/generated/canny_edge_detection.cxx
+   -- shim/generated/cast.cxx
+   -- shim/generated/confidence_connected.cxx
+   -- shim/generated/connected_threshold.cxx
+   -- shim/generated/curvature_anisotropic_diffusion.cxx
    -- shim/generated/discrete_gaussian.cxx
+   -- shim/generated/gradient_anisotropic_diffusion.cxx
+   -- shim/generated/grayscale_dilate.cxx
+   -- shim/generated/grayscale_erode.cxx
+   -- shim/generated/grayscale_morphological_closing.cxx
+   -- shim/generated/grayscale_morphological_opening.cxx
+   -- shim/generated/intensity_windowing.cxx
+   -- shim/generated/invert_intensity.cxx
    -- shim/generated/itklib_builtin.hpp
    -- shim/generated/itklib_classes.inc
    -- shim/generated/itklib_filters.h
    -- shim/generated/itklib_supported.cxx
+   -- shim/generated/mean.cxx
+   -- shim/generated/otsu_threshold.cxx
+   -- shim/generated/sigmoid.cxx
+   -- src/ada/generated/itklib-filters-image_feature-canny_edge_detection.adb
+   -- src/ada/generated/itklib-filters-image_feature-canny_edge_detection.ads
+   -- src/ada/generated/itklib-filters-image_feature.ads
+   -- src/ada/generated/itklib-filters-image_intensity-cast.adb
+   -- src/ada/generated/itklib-filters-image_intensity-cast.ads
+   -- src/ada/generated/itklib-filters-image_intensity-intensity_windowing.adb
+   -- src/ada/generated/itklib-filters-image_intensity-intensity_windowing.ads
+   -- src/ada/generated/itklib-filters-image_intensity-invert_intensity.adb
+   -- src/ada/generated/itklib-filters-image_intensity-invert_intensity.ads
+   -- src/ada/generated/itklib-filters-image_intensity-sigmoid.adb
+   -- src/ada/generated/itklib-filters-image_intensity-sigmoid.ads
+   -- src/ada/generated/itklib-filters-morphology-binary_closing.adb
+   -- src/ada/generated/itklib-filters-morphology-binary_closing.ads
+   -- src/ada/generated/itklib-filters-morphology-binary_dilate.adb
+   -- src/ada/generated/itklib-filters-morphology-binary_dilate.ads
+   -- src/ada/generated/itklib-filters-morphology-binary_erode.adb
+   -- src/ada/generated/itklib-filters-morphology-binary_erode.ads
+   -- src/ada/generated/itklib-filters-morphology-binary_fillhole.adb
+   -- src/ada/generated/itklib-filters-morphology-binary_fillhole.ads
+   -- src/ada/generated/itklib-filters-morphology-binary_opening.adb
+   -- src/ada/generated/itklib-filters-morphology-binary_opening.ads
+   -- src/ada/generated/itklib-filters-morphology-grayscale_closing.adb
+   -- src/ada/generated/itklib-filters-morphology-grayscale_closing.ads
+   -- src/ada/generated/itklib-filters-morphology-grayscale_dilate.adb
+   -- src/ada/generated/itklib-filters-morphology-grayscale_dilate.ads
+   -- src/ada/generated/itklib-filters-morphology-grayscale_erode.adb
+   -- src/ada/generated/itklib-filters-morphology-grayscale_erode.ads
+   -- src/ada/generated/itklib-filters-morphology-grayscale_opening.adb
+   -- src/ada/generated/itklib-filters-morphology-grayscale_opening.ads
+   -- src/ada/generated/itklib-filters-morphology.ads
+   -- src/ada/generated/itklib-filters-region_growing-confidence_connected.adb
+   -- src/ada/generated/itklib-filters-region_growing-confidence_connected.ads
+   -- src/ada/generated/itklib-filters-region_growing-connected_threshold.adb
+   -- src/ada/generated/itklib-filters-region_growing-connected_threshold.ads
+   -- src/ada/generated/itklib-filters-region_growing.ads
+   -- src/ada/generated/itklib-filters-smoothing-curvature_anisotropic_diffusion.adb
+   -- src/ada/generated/itklib-filters-smoothing-curvature_anisotropic_diffusion.ads
    -- src/ada/generated/itklib-filters-smoothing-discrete_gaussian.adb
    -- src/ada/generated/itklib-filters-smoothing-discrete_gaussian.ads
+   -- src/ada/generated/itklib-filters-smoothing-gradient_anisotropic_diffusion.adb
+   -- src/ada/generated/itklib-filters-smoothing-gradient_anisotropic_diffusion.ads
+   -- src/ada/generated/itklib-filters-smoothing-mean.adb
+   -- src/ada/generated/itklib-filters-smoothing-mean.ads
+   -- src/ada/generated/itklib-filters-thresholding-otsu_threshold.adb
+   -- src/ada/generated/itklib-filters-thresholding-otsu_threshold.ads
    -- src/ada/generated/itklib-instances-uint16.ads
    -- src/ada/generated/itklib-instances.ads
    -- src/ada/generated/itklib-supported.adb

@@ -1,0 +1,25 @@
+name: GradientAnisotropicDiffusion
+id: 26
+itk_class: GradientAnisotropicDiffusionImageFilter
+header: itkGradientAnisotropicDiffusionImageFilter.h
+module: ITKAnisotropicSmoothing
+ada_package: Itklib.Filters.Smoothing.Gradient_Anisotropic_Diffusion
+pixel_category: real_only
+output: same
+formal: pair
+generate_sources: true
+dimensions: [2, 3]
+brief: itk::GradientAnisotropicDiffusionImageFilter. Real pixels only.
+members:
+  - name: TimeStep
+    itk: SetTimeStep
+    kind: double
+    ada: Set_Time_Step
+  - name: NumberOfIterations
+    itk: SetNumberOfIterations
+    kind: unsigned
+    ada: Set_Number_Of_Iterations
+  - name: ConductanceParameter
+    itk: SetConductanceParameter
+    kind: double
+    ada: Set_Conductance_Parameter

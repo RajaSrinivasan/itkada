@@ -31,6 +31,8 @@ if [[ "${ITKLIB_SKIP_FLOAT32:-0}" != "1" ]]; then
   LIBSTD="$(dirname "$(alr exec -- g++ -print-file-name=libstdc++.so)")"
   export LD_LIBRARY_PATH="${ROOT}/lib:${ITK_LIB}:${LIBSTD}${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"
   ./bin/generated_tests
+  python3 "${ROOT}/tools/add_pixel_type.py" --pixel float32 --remove
+  alr build
 fi
 
 echo "phase 2 checks passed"

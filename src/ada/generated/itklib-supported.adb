@@ -52,6 +52,46 @@ package body Itklib.Supported with SPARK_Mode => Off is
             return 9;
          when Statistics =>
             return 10;
+         when GrayscaleErode =>
+            return 11;
+         when GrayscaleDilate =>
+            return 12;
+         when GrayscaleMorphologicalOpening =>
+            return 13;
+         when GrayscaleMorphologicalClosing =>
+            return 14;
+         when BinaryErode =>
+            return 15;
+         when BinaryDilate =>
+            return 16;
+         when BinaryMorphologicalOpening =>
+            return 17;
+         when BinaryMorphologicalClosing =>
+            return 18;
+         when BinaryFillhole =>
+            return 19;
+         when OtsuThreshold =>
+            return 20;
+         when ConnectedThreshold =>
+            return 21;
+         when ConfidenceConnected =>
+            return 22;
+         when Cast =>
+            return 23;
+         when CannyEdgeDetection =>
+            return 24;
+         when CurvatureAnisotropicDiffusion =>
+            return 25;
+         when GradientAnisotropicDiffusion =>
+            return 26;
+         when IntensityWindowing =>
+            return 27;
+         when Sigmoid =>
+            return 28;
+         when InvertIntensity =>
+            return 29;
+         when Mean =>
+            return 30;
       end case;
    end Id_Code;
 

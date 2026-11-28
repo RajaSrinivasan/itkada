@@ -17,7 +17,7 @@ package Adaimg_Command with SPARK_Mode => On is
    type Mode_Kind is (Help, Identify, Pipeline, Usage_Error);
    type Op_Kind is
      (Blur, Median, Threshold, Rescale, Resize_Shrink, Resize_Resample,
-      Resize_Copy, Flip, Crop, Edge);
+      Resize_Copy, Flip, Crop, Edge, Erode, Dilate, Otsu, Grow, Canny);
 
    type Operation is record
       Kind : Op_Kind := Edge;
@@ -32,6 +32,8 @@ package Adaimg_Command with SPARK_Mode => On is
       Crop_H : Positive := 1;
       Crop_X : Natural := 0;
       Crop_Y : Natural := 0;
+      Seed_X : Natural := 0;
+      Seed_Y : Natural := 0;
    end record;
 
    type Op_Array is array (1 .. Max_Ops) of Operation;

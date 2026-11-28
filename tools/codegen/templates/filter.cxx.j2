@@ -51,7 +51,7 @@ template <typename Pixel, unsigned Dimension>
 using Filter_Type = itk::{{ itk_class }}<
   itk::Image<Pixel, Dimension>, itk::Image<Pixel, Dimension>,
   itk::FlatStructuringElement<Dimension>>;
-{% elif output == "none" %}
+{% elif itk_arity == 1 or output == "none" %}
 template <typename Pixel, unsigned Dimension>
 using Filter_Type = itk::{{ itk_class }}<itk::Image<Pixel, Dimension>>;
 {% else %}

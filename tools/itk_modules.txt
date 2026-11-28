@@ -11,3 +11,12 @@ ITKThresholding
 ITKImageIntensity
 ITKImageGrid
 ITKImageGradient
+
+# Phase 3 medical algorithms.
+ITKMathematicalMorphology
+ITKBinaryMathematicalMorphology
+ITKRegionGrowing
+ITKImageFeature
+ITKAnisotropicSmoothing
+ITKLabelMap
+ITKImageFilterBase
