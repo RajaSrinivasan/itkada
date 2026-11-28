@@ -49,8 +49,11 @@ package body Itklib.Filters.Image_Grid.Flip with SPARK_Mode => Off is
    end Get_Output;
 
 begin
-   if not Thin.Is_Supported (Img.Pixel_Kind_Id, Img.Image_Dimension) then
+   if not Itklib.Supported.Agrees
+     (Itklib.Supported.Flip, Img.Pixel_Kind_Id, Img.Pixel_Kind_Id,
+      Img.Image_Dimension)
+   then
       raise Unsupported_Instantiation with
-        "Flip is not built for this pixel kind and dimension";
+        "Flip Ada support and the C table disagree";
    end if;
 end Itklib.Filters.Image_Grid.Flip;

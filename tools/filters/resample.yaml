@@ -1,0 +1,14 @@
+name: Resample
+id: 6
+ada_package: Itklib.Filters.Image_Grid.Resample
+pixel_category: scalar
+output: same
+formal: pair
+generate_sources: false
+pixels: [uint16]
+dimensions: [2, 3]
+manual_reason: "Uniform_Resample is hand-written for UInt16. add_pixel_type.py does not extend it."
+brief: Resample with a linear interpolator and the identity transform.
+adaimg:
+  option: resize
+  help: "-resize N%           resample when the scale is not an integer shrink"

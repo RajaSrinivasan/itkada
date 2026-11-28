@@ -6,24 +6,24 @@
 
 namespace {
 
-template <unsigned Dimension>
-itk::Image<std::uint16_t, Dimension> *
+template <typename Pixel, unsigned Dimension>
+itk::Image<Pixel, Dimension> *
 as_image (itklib_object * wrap)
 {
-  using Image_Type = itk::Image<std::uint16_t, Dimension>;
+  using Image_Type = itk::Image<Pixel, Dimension>;
   if (wrap == nullptr || wrap->obj == nullptr || wrap->klass != ITKLIB_CLASS_IMAGE
-      || wrap->pixel != ITKLIB_UINT16 || wrap->dim != Dimension)
+      || wrap->pixel != Itklib_Pixel<Pixel>::Id || wrap->dim != Dimension)
     {
       return nullptr;
     }
   return dynamic_cast<Image_Type *> (wrap->obj);
 }
 
-template <unsigned Dimension>
+template <typename Pixel, unsigned Dimension>
 void
 image_new (const uint64_t * size, itklib_object ** out)
 {
-  using Image_Type = itk::Image<std::uint16_t, Dimension>;
+  using Image_Type = itk::Image<Pixel, Dimension>;
   if (size == nullptr)
     {
       throw itklib_status{ITKLIB_E_NULL, "size pointer is null", "itklib_image_new"};
@@ -50,33 +50,33 @@ image_new (const uint64_t * size, itklib_object ** out)
   region.SetSize (extent);
   image->SetRegions (region);
   image->Allocate (true);
-  *out = itklib_adopt (image.GetPointer (), ITKLIB_UINT16, Dimension,
+  *out = itklib_adopt (image.GetPointer (), Itklib_Pixel<Pixel>::Id, Dimension,
                        ITKLIB_CLASS_IMAGE, true);
 }
 
-template <unsigned Dimension>
+template <typename Pixel, unsigned Dimension>
 void
 image_buffer (itklib_object * image, void ** data, uint64_t * count)
 {
-  auto * concrete = as_image<Dimension> (image);
+  auto * concrete = as_image<Pixel, Dimension> (image);
   if (concrete == nullptr)
     {
-      throw itklib_status{ITKLIB_E_ARG, "handle is not a UInt16 image",
+      throw itklib_status{ITKLIB_E_ARG, "handle is not a matching image",
                           "itklib_image_buffer"};
     }
   *count = concrete->GetBufferedRegion ().GetNumberOfPixels ();
   *data = concrete->GetBufferPointer ();
 }
 
-template <unsigned Dimension>
+template <typename Pixel, unsigned Dimension>
 void
 image_get_geometry (itklib_object * image, int64_t * index, uint64_t * size,
                     double * spacing, double * origin, double * direction)
 {
-  auto * concrete = as_image<Dimension> (image);
+  auto * concrete = as_image<Pixel, Dimension> (image);
   if (concrete == nullptr)
     {
-      throw itklib_status{ITKLIB_E_ARG, "handle is not a UInt16 image",
+      throw itklib_status{ITKLIB_E_ARG, "handle is not a matching image",
                           "itklib_image_get_geometry"};
     }
   const auto region = concrete->GetLargestPossibleRegion ();
@@ -114,17 +114,17 @@ image_get_geometry (itklib_object * image, int64_t * index, uint64_t * size,
     }
 }
 
-template <unsigned Dimension>
+template <typename Pixel, unsigned Dimension>
 void
 image_set_spacing (itklib_object * image, const double * spacing)
 {
-  auto * concrete = as_image<Dimension> (image);
+  auto * concrete = as_image<Pixel, Dimension> (image);
   if (concrete == nullptr || spacing == nullptr)
     {
       throw itklib_status{ITKLIB_E_ARG, "invalid spacing arguments",
                           "itklib_image_set_spacing"};
     }
-  typename itk::Image<std::uint16_t, Dimension>::SpacingType value;
+  typename itk::Image<Pixel, Dimension>::SpacingType value;
   for (unsigned axis = 0; axis < Dimension; ++axis)
     {
       value[axis] = spacing[axis];
@@ -132,17 +132,17 @@ image_set_spacing (itklib_object * image, const double * spacing)
   concrete->SetSpacing (value);
 }
 
-template <unsigned Dimension>
+template <typename Pixel, unsigned Dimension>
 void
 image_set_origin (itklib_object * image, const double * origin)
 {
-  auto * concrete = as_image<Dimension> (image);
+  auto * concrete = as_image<Pixel, Dimension> (image);
   if (concrete == nullptr || origin == nullptr)
     {
       throw itklib_status{ITKLIB_E_ARG, "invalid origin arguments",
                           "itklib_image_set_origin"};
     }
-  typename itk::Image<std::uint16_t, Dimension>::PointType value;
+  typename itk::Image<Pixel, Dimension>::PointType value;
   for (unsigned axis = 0; axis < Dimension; ++axis)
     {
       value[axis] = origin[axis];
@@ -150,17 +150,17 @@ image_set_origin (itklib_object * image, const double * origin)
   concrete->SetOrigin (value);
 }
 
-template <unsigned Dimension>
+template <typename Pixel, unsigned Dimension>
 void
 image_set_direction (itklib_object * image, const double * direction)
 {
-  auto * concrete = as_image<Dimension> (image);
+  auto * concrete = as_image<Pixel, Dimension> (image);
   if (concrete == nullptr || direction == nullptr)
     {
       throw itklib_status{ITKLIB_E_ARG, "invalid direction arguments",
                           "itklib_image_set_direction"};
     }
-  typename itk::Image<std::uint16_t, Dimension>::DirectionType matrix;
+  typename itk::Image<Pixel, Dimension>::DirectionType matrix;
   for (unsigned row = 0; row < Dimension; ++row)
     {
       for (unsigned column = 0; column < Dimension; ++column)
@@ -171,19 +171,19 @@ image_set_direction (itklib_object * image, const double * direction)
   concrete->SetDirection (matrix);
 }
 
-template <unsigned Dimension>
+template <typename Pixel, unsigned Dimension>
 void
 image_index_to_physical (itklib_object * image, const int64_t * index,
                          double * point)
 {
-  auto * concrete = as_image<Dimension> (image);
+  auto * concrete = as_image<Pixel, Dimension> (image);
   if (concrete == nullptr || index == nullptr || point == nullptr)
     {
       throw itklib_status{ITKLIB_E_ARG, "invalid physical-point arguments",
                           "itklib_image_index_to_physical"};
     }
-  typename itk::Image<std::uint16_t, Dimension>::IndexType idx;
-  typename itk::Image<std::uint16_t, Dimension>::PointType physical;
+  typename itk::Image<Pixel, Dimension>::IndexType idx;
+  typename itk::Image<Pixel, Dimension>::PointType physical;
   for (unsigned axis = 0; axis < Dimension; ++axis)
     {
       idx[axis] = index[axis];
@@ -195,19 +195,19 @@ image_index_to_physical (itklib_object * image, const int64_t * index,
     }
 }
 
-template <unsigned Dimension>
+template <typename Pixel, unsigned Dimension>
 void
 image_physical_to_index (itklib_object * image, const double * point,
                          int64_t * index)
 {
-  auto * concrete = as_image<Dimension> (image);
+  auto * concrete = as_image<Pixel, Dimension> (image);
   if (concrete == nullptr || point == nullptr || index == nullptr)
     {
       throw itklib_status{ITKLIB_E_ARG, "invalid index arguments",
                           "itklib_image_physical_to_index"};
     }
-  typename itk::Image<std::uint16_t, Dimension>::PointType physical;
-  typename itk::Image<std::uint16_t, Dimension>::IndexType idx;
+  typename itk::Image<Pixel, Dimension>::PointType physical;
+  typename itk::Image<Pixel, Dimension>::IndexType idx;
   for (unsigned axis = 0; axis < Dimension; ++axis)
     {
       physical[axis] = point[axis];
@@ -221,10 +221,6 @@ image_physical_to_index (itklib_object * image, const double * point,
 
 } // namespace
 
-/* Explicit Phase 0 instances. The functions below instantiate them too. */
-template class itk::Image<std::uint16_t, 2>;
-template class itk::Image<std::uint16_t, 3>;
-
 extern "C" int
 itklib_image_new (itklib_pixel_id pixel, unsigned dimension, const uint64_t * size,
                   itklib_object ** out, itklib_error * error)
@@ -237,14 +233,11 @@ itklib_image_new (itklib_pixel_id pixel, unsigned dimension, const uint64_t * si
       }
     *out = nullptr;
     itklib_require_built (pixel, dimension);
-    if (dimension == 2)
-      {
-        image_new<2> (size, out);
-      }
-    else
-      {
-        image_new<3> (size, out);
-      }
+    itklib_visit_builtin (pixel, dimension, [&] (auto pixel_tag, auto dim_tag) {
+      using Pixel = typename decltype (pixel_tag)::type;
+      constexpr unsigned Dimension = decltype (dim_tag)::value;
+      image_new<Pixel, Dimension> (size, out);
+    });
   });
 }
 
@@ -264,19 +257,11 @@ itklib_image_buffer (itklib_object * image, void ** data, uint64_t * count,
       {
         throw itklib_status{ITKLIB_E_NULL, "null image", "itklib_image_buffer"};
       }
-    if (image->dim == 2)
-      {
-        image_buffer<2> (image, data, count);
-      }
-    else if (image->dim == 3)
-      {
-        image_buffer<3> (image, data, count);
-      }
-    else
-      {
-        throw itklib_status{ITKLIB_E_UNSUPPORTED, "unsupported image dimension",
-                            "itklib_image_buffer"};
-      }
+    itklib_visit_builtin (image->pixel, image->dim, [&] (auto pixel_tag, auto dim_tag) {
+      using Pixel = typename decltype (pixel_tag)::type;
+      constexpr unsigned Dimension = decltype (dim_tag)::value;
+      image_buffer<Pixel, Dimension> (image, data, count);
+    });
   });
 }
 
@@ -291,19 +276,11 @@ itklib_image_get_geometry (itklib_object * image, int64_t * index, uint64_t * si
         throw itklib_status{ITKLIB_E_NULL, "null image",
                             "itklib_image_get_geometry"};
       }
-    if (image->dim == 2)
-      {
-        image_get_geometry<2> (image, index, size, spacing, origin, direction);
-      }
-    else if (image->dim == 3)
-      {
-        image_get_geometry<3> (image, index, size, spacing, origin, direction);
-      }
-    else
-      {
-        throw itklib_status{ITKLIB_E_UNSUPPORTED, "unsupported image dimension",
-                            "itklib_image_get_geometry"};
-      }
+    itklib_visit_builtin (image->pixel, image->dim, [&] (auto pixel_tag, auto dim_tag) {
+      using Pixel = typename decltype (pixel_tag)::type;
+      constexpr unsigned Dimension = decltype (dim_tag)::value;
+      image_get_geometry<Pixel, Dimension> (image, index, size, spacing, origin, direction);
+    });
   });
 }
 
@@ -316,14 +293,11 @@ itklib_image_set_spacing (itklib_object * image, const double * spacing,
       {
         throw itklib_status{ITKLIB_E_NULL, "null image", "itklib_image_set_spacing"};
       }
-    if (image->dim == 2)
-      {
-        image_set_spacing<2> (image, spacing);
-      }
-    else
-      {
-        image_set_spacing<3> (image, spacing);
-      }
+    itklib_visit_builtin (image->pixel, image->dim, [&] (auto pixel_tag, auto dim_tag) {
+      using Pixel = typename decltype (pixel_tag)::type;
+      constexpr unsigned Dimension = decltype (dim_tag)::value;
+      image_set_spacing<Pixel, Dimension> (image, spacing);
+    });
   });
 }
 
@@ -336,14 +310,11 @@ itklib_image_set_origin (itklib_object * image, const double * origin,
       {
         throw itklib_status{ITKLIB_E_NULL, "null image", "itklib_image_set_origin"};
       }
-    if (image->dim == 2)
-      {
-        image_set_origin<2> (image, origin);
-      }
-    else
-      {
-        image_set_origin<3> (image, origin);
-      }
+    itklib_visit_builtin (image->pixel, image->dim, [&] (auto pixel_tag, auto dim_tag) {
+      using Pixel = typename decltype (pixel_tag)::type;
+      constexpr unsigned Dimension = decltype (dim_tag)::value;
+      image_set_origin<Pixel, Dimension> (image, origin);
+    });
   });
 }
 
@@ -357,14 +328,11 @@ itklib_image_set_direction (itklib_object * image, const double * direction,
         throw itklib_status{ITKLIB_E_NULL, "null image",
                             "itklib_image_set_direction"};
       }
-    if (image->dim == 2)
-      {
-        image_set_direction<2> (image, direction);
-      }
-    else
-      {
-        image_set_direction<3> (image, direction);
-      }
+    itklib_visit_builtin (image->pixel, image->dim, [&] (auto pixel_tag, auto dim_tag) {
+      using Pixel = typename decltype (pixel_tag)::type;
+      constexpr unsigned Dimension = decltype (dim_tag)::value;
+      image_set_direction<Pixel, Dimension> (image, direction);
+    });
   });
 }
 
@@ -436,19 +404,11 @@ itklib_image_index_to_physical (itklib_object * image, const int64_t * index,
         throw itklib_status{ITKLIB_E_NULL, "null image",
                             "itklib_image_index_to_physical"};
       }
-    if (image->dim == 2)
-      {
-        image_index_to_physical<2> (image, index, point);
-      }
-    else if (image->dim == 3)
-      {
-        image_index_to_physical<3> (image, index, point);
-      }
-    else
-      {
-        throw itklib_status{ITKLIB_E_UNSUPPORTED, "unsupported image dimension",
-                            "itklib_image_index_to_physical"};
-      }
+    itklib_visit_builtin (image->pixel, image->dim, [&] (auto pixel_tag, auto dim_tag) {
+      using Pixel = typename decltype (pixel_tag)::type;
+      constexpr unsigned Dimension = decltype (dim_tag)::value;
+      image_index_to_physical<Pixel, Dimension> (image, index, point);
+    });
   });
 }
 
@@ -462,18 +422,10 @@ itklib_image_physical_to_index (itklib_object * image, const double * point,
         throw itklib_status{ITKLIB_E_NULL, "null image",
                             "itklib_image_physical_to_index"};
       }
-    if (image->dim == 2)
-      {
-        image_physical_to_index<2> (image, point, index);
-      }
-    else if (image->dim == 3)
-      {
-        image_physical_to_index<3> (image, point, index);
-      }
-    else
-      {
-        throw itklib_status{ITKLIB_E_UNSUPPORTED, "unsupported image dimension",
-                            "itklib_image_physical_to_index"};
-      }
+    itklib_visit_builtin (image->pixel, image->dim, [&] (auto pixel_tag, auto dim_tag) {
+      using Pixel = typename decltype (pixel_tag)::type;
+      constexpr unsigned Dimension = decltype (dim_tag)::value;
+      image_physical_to_index<Pixel, Dimension> (image, point, index);
+    });
   });
 }

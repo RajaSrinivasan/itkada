@@ -1,10 +1,18 @@
 with Itklib.Images;
 with Itklib.Process_Object;
+with Itklib.Supported;
 
 generic
    with package Input is new Itklib.Images (<>);
    with package Output is new Itklib.Images (<>);
 package Itklib.Filters.Image_Grid.Extract with SPARK_Mode => Off is
+   pragma Compile_Time_Error
+     (Input.Pixel_Kind_Id /= Output.Pixel_Kind_Id
+      or else Input.Image_Dimension /= Output.Image_Dimension
+      or else not Itklib.Supported.Extract
+        (Input.Pixel_Kind_Id, Input.Image_Dimension),
+      "Extract is not built for this pixel kind and dimension");
+
    --  itk::ExtractImageFilter with the same input and output dimension,
    --  so the crop stays in-plane (a size of 1 does not drop an axis).
    --  Direction collapse is set to submatrix for the equal-dimension case,

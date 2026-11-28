@@ -68,8 +68,8 @@ jobs:
           echo "find_package and itk_paths.gpr refreshed in $((end - start))s"
           grep ITK_Version itk_paths.gpr
 
-      - name: Install SimpleITK and ITK Python
-        run: python3 -m pip install --user SimpleITK itk
+      - name: Install SimpleITK, ITK Python, and the code generator
+        run: python3 -m pip install --user SimpleITK itk PyYAML Jinja2
 
-      - name: Build itklib, test, prove, and compare with SimpleITK
-        run: bash tools/run_phase1_tests.sh
+      - name: Build itklib, test, prove, compare, and run the float32 generator
+        run: bash tools/run_phase2_tests.sh

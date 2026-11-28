@@ -3,6 +3,7 @@ with "../../itklib.gpr";
 project Bad_Pixel_Check is
    for Main use ("bad_main.adb");
    for Source_Dirs use (".");
+   for Source_Files use ("bad_main.adb", "bad_pixel.ads");
    for Object_Dir use "../../obj/bad_pixel";
    for Exec_Dir use "../../obj/bad_pixel";
    for Create_Missing_Dirs use "True";

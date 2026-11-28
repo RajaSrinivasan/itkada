@@ -46,8 +46,11 @@ begin
       raise Unsupported_Instantiation with
         "RescaleIntensity requires matching input and output images";
    end if;
-   if not Thin.Is_Supported (Input.Pixel_Kind_Id, Input.Image_Dimension) then
+   if not Itklib.Supported.Agrees
+     (Itklib.Supported.RescaleIntensity, Input.Pixel_Kind_Id, Input.Pixel_Kind_Id,
+      Input.Image_Dimension)
+   then
       raise Unsupported_Instantiation with
-        "RescaleIntensity is not built for this pixel kind and dimension";
+        "RescaleIntensity Ada support and the C table disagree";
    end if;
 end Itklib.Filters.Image_Intensity.Rescale_Intensity;

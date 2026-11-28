@@ -1,0 +1,14 @@
+with "../../itklib.gpr";
+
+project Unsupported_Filter is
+   for Main use ("unsupported_main.adb");
+   for Source_Dirs use (".");
+   for Source_Files use ("unsupported_main.adb");
+   for Object_Dir use "../../obj/unsupported_filter";
+   for Exec_Dir use "../../obj/unsupported_filter";
+   for Create_Missing_Dirs use "True";
+
+   package Compiler is
+      for Default_Switches ("Ada") use ("-gnat2022");
+   end Compiler;
+end Unsupported_Filter;

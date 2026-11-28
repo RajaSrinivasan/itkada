@@ -1,0 +1,35 @@
+# SimpleITK-shaped description plus Ada fields. SimpleITK is Apache-2.0.
+name: DiscreteGaussian
+id: 1
+itk_class: DiscreteGaussianImageFilter
+header: itkDiscreteGaussianImageFilter.h
+module: ITKSmoothing
+ada_package: Itklib.Filters.Smoothing.Discrete_Gaussian
+klass: ITKLIB_CLASS_GAUSSIAN
+pixel_category: scalar
+output: same
+formal: pair
+generate_sources: true
+dimensions: [2, 3]
+brief: >
+  itk::DiscreteGaussianImageFilter. Variance is sigma squared on each axis.
+  adaimg -blur sets the same variance on x and y.
+members:
+  - name: Variance
+    itk: SetVariance
+    kind: double_vector
+    ada: Set_Variance
+  - name: MaximumError
+    itk: SetMaximumError
+    kind: double_vector
+    ada: Set_Maximum_Error
+  - name: UseImageSpacing
+    itk: SetUseImageSpacing
+    kind: bool
+    ada: Set_Use_Image_Spacing
+tests:
+  - name: constant_image
+    brief: a constant UInt16 image stays near that value after a small variance
+adaimg:
+  option: blur
+  help: "-blur sigma          discrete gaussian, variance = sigma*sigma"
