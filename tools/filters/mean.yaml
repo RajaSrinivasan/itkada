@@ -1,0 +1,17 @@
+name: Mean
+id: 30
+itk_class: MeanImageFilter
+header: itkMeanImageFilter.h
+module: ITKSmoothing
+ada_package: Itklib.Filters.Smoothing.Mean
+pixel_category: scalar
+output: same
+formal: pair
+generate_sources: true
+dimensions: [2, 3]
+brief: itk::MeanImageFilter. Radius is the neighborhood radius on each axis.
+members:
+  - name: Radius
+    itk: SetRadius
+    kind: radius
+    ada: Set_Radius

@@ -13,7 +13,12 @@ package body Adaimg_Command with SPARK_Mode => On is
       "                       otherwise resample with linear interpolation" & ASCII.LF &
       "  -flip x|y            flip that axis (ITK origin follows the pixels)" & ASCII.LF &
       "  -crop WxH+X+Y        region index (X,Y), size (W,H), origin 0" & ASCII.LF &
-      "  -edge                gradient magnitude (UInt16; not Canny)");
+      "  -edge                gradient magnitude (UInt16; not Canny)" & ASCII.LF &
+      "  -erode r             grayscale erosion, ball radius r" & ASCII.LF &
+      "  -dilate r            grayscale dilation, ball radius r" & ASCII.LF &
+      "  -otsu                Otsu threshold, inside 65535, outside 0" & ASCII.LF &
+      "  -grow x,y,lo:hi      connected threshold from seed (x,y)" & ASCII.LF &
+      "  -canny sigma         Canny edges; needs generated float32");
 
    function To_Text (Value : String) return Texts.Bounded_String is
       Result : Texts.Bounded_String := Texts.Null_Bounded_String;
@@ -176,6 +181,8 @@ package body Adaimg_Command with SPARK_Mode => On is
             if Token = "-blur" or else Token = "-median" or else Token = "-threshold"
               or else Token = "-rescale" or else Token = "-resize"
               or else Token = "-flip" or else Token = "-crop"
+              or else Token = "-erode" or else Token = "-dilate"
+              or else Token = "-grow" or else Token = "-canny"
             then
                if Index + 1 >= Last then
                   return Error ("missing argument for " & Token);
@@ -241,6 +248,71 @@ package body Adaimg_Command with SPARK_Mode => On is
                            Op.Scale := Long_Float (Number.Whole) / 100.0;
                         end if;
                      end;
+                  elsif Token = "-erode" or else Token = "-dilate" then
+                     declare
+                        Number : constant Adaimg_Command.Number := Parse_Number (Arg);
+                     begin
+                        if not Number.Ok or else Number.Value /= Long_Float (Number.Whole) then
+                           return Error (Token & " needs an integer radius");
+                        end if;
+                        if Token = "-erode" then
+                           Op.Kind := Erode;
+                        else
+                           Op.Kind := Dilate;
+                        end if;
+                        Op.Radius := Number.Whole;
+                     end;
+                  elsif Token = "-canny" then
+                     declare
+                        Number : constant Adaimg_Command.Number := Parse_Number (Arg);
+                     begin
+                        if not Number.Ok or else Number.Value <= 0.0 then
+                           return Error ("-canny needs a positive sigma");
+                        end if;
+                        Op.Kind := Canny;
+                        Op.Sigma := Number.Value;
+                     end;
+                  elsif Token = "-grow" then
+                     declare
+                        Comma_1 : Natural := 0;
+                        Comma_2 : Natural := 0;
+                     begin
+                        for I in Arg'Range loop
+                           if Arg (I) = ',' then
+                              if Comma_1 = 0 then
+                                 Comma_1 := I;
+                              elsif Comma_2 = 0 then
+                                 Comma_2 := I;
+                              end if;
+                           end if;
+                        end loop;
+                        if Comma_1 <= Arg'First or else Comma_2 <= Comma_1
+                          or else Comma_2 >= Arg'Last
+                        then
+                           return Error ("-grow needs x,y,lo:hi");
+                        end if;
+                        declare
+                           X : constant Number :=
+                             Parse_Number (Arg (Arg'First .. Comma_1 - 1));
+                           Y : constant Number :=
+                             Parse_Number (Arg (Comma_1 + 1 .. Comma_2 - 1));
+                           Ends : constant Pair :=
+                             Range_Ends (Arg (Comma_2 + 1 .. Arg'Last));
+                        begin
+                           if not X.Ok or else not Y.Ok or else not Ends.Ok
+                             or else Ends.Low > Ends.High
+                             or else X.Value /= Long_Float (X.Whole)
+                             or else Y.Value /= Long_Float (Y.Whole)
+                           then
+                              return Error ("-grow needs x,y,lo:hi");
+                           end if;
+                           Op.Kind := Grow;
+                           Op.Seed_X := X.Whole;
+                           Op.Seed_Y := Y.Whole;
+                           Op.Low := Ends.Low;
+                           Op.High := Ends.High;
+                        end;
+                     end;
                   elsif Token = "-flip" then
                      if Arg'Length /= 1 or else Arg (Arg'First) not in 'x' | 'X' | 'y' | 'Y' then
                         return Error ("-flip needs x or y");
@@ -304,6 +376,9 @@ package body Adaimg_Command with SPARK_Mode => On is
                end;
             elsif Token = "-edge" then
                Op.Kind := Edge;
+               Index := Index + 1;
+            elsif Token = "-otsu" then
+               Op.Kind := Otsu;
                Index := Index + 1;
             else
                return Error ("unknown option " & Token);

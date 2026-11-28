@@ -1,0 +1,93 @@
+# ITK scalar pixels. Ids match SimpleITK's PixelIDValueEnum and itklib_pixel_id.
+# Vector, RGB, RGBA, and complex pixels are rejected until phase 5.
+# SimpleITK's filter descriptions are Apache-2.0; see tools/filters/.
+pixels:
+  - name: uint8
+    cxx: std::uint8_t
+    ada_type: Interfaces.Unsigned_8
+    ada_kind: UInt8
+    id: 1
+    bits: 8
+    category: integer
+    png: true
+  - name: int8
+    cxx: std::int8_t
+    ada_type: Interfaces.Integer_8
+    ada_kind: Int8
+    id: 2
+    bits: 8
+    category: integer
+    png: false
+    png_skip: "PNG ImageIO stores unsigned samples; cast to uint8 or uint16 before writing"
+  - name: uint16
+    cxx: std::uint16_t
+    ada_type: Interfaces.Unsigned_16
+    ada_kind: UInt16
+    id: 3
+    bits: 16
+    category: integer
+    png: true
+    signature: hand
+  - name: int16
+    cxx: std::int16_t
+    ada_type: Interfaces.Integer_16
+    ada_kind: Int16
+    id: 4
+    bits: 16
+    category: integer
+    png: false
+    png_skip: "PNG ImageIO stores unsigned samples; cast to uint16 before writing"
+  - name: uint32
+    cxx: std::uint32_t
+    ada_type: Interfaces.Unsigned_32
+    ada_kind: UInt32
+    id: 5
+    bits: 32
+    category: integer
+    png: false
+    png_skip: "PNG ImageIO does not store 32-bit samples; rescale or cast to uint16 before writing"
+  - name: int32
+    cxx: std::int32_t
+    ada_type: Interfaces.Integer_32
+    ada_kind: Int32
+    id: 6
+    bits: 32
+    category: integer
+    png: false
+    png_skip: "PNG ImageIO does not store 32-bit samples; rescale or cast to uint16 before writing"
+  - name: uint64
+    cxx: std::uint64_t
+    ada_type: Interfaces.Unsigned_64
+    ada_kind: UInt64
+    id: 7
+    bits: 64
+    category: integer
+    png: false
+    png_skip: "PNG ImageIO does not store 64-bit samples; rescale or cast to uint16 before writing"
+  - name: int64
+    cxx: std::int64_t
+    ada_type: Interfaces.Integer_64
+    ada_kind: Int64
+    id: 8
+    bits: 64
+    category: integer
+    png: false
+    png_skip: "PNG ImageIO does not store 64-bit samples; rescale or cast to uint16 before writing"
+  - name: float32
+    cxx: float
+    ada_type: Interfaces.IEEE_Float_32
+    ada_kind: Float32
+    id: 9
+    bits: 32
+    category: real
+    png: false
+    png_skip: "PNG stores integer samples; rescale or cast to an integer pixel before writing"
+  - name: float64
+    cxx: double
+    ada_type: Interfaces.IEEE_Float_64
+    ada_kind: Float64
+    id: 10
+    bits: 64
+    category: real
+    png: false
+    png_skip: "PNG stores integer samples; rescale or cast to an integer pixel before writing"

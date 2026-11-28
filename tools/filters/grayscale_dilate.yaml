@@ -1,0 +1,22 @@
+name: GrayscaleDilate
+id: 12
+itk_class: GrayscaleDilateImageFilter
+header: itkGrayscaleDilateImageFilter.h
+module: ITKMathematicalMorphology
+ada_package: Itklib.Filters.Morphology.Grayscale_Dilate
+pixel_category: scalar
+output: same
+formal: pair
+generate_sources: true
+structuring_element: ball
+dimensions: [2, 3]
+brief: itk::GrayscaleDilateImageFilter with a ball structuring element.
+members:
+
+  - name: Radius
+    itk: SetKernel
+    kind: ball_radius
+    ada: Set_Radius
+adaimg:
+  option: dilate
+  help: '-dilate r           grayscale dilation, ball radius r'

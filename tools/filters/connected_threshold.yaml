@@ -1,0 +1,37 @@
+name: ConnectedThreshold
+id: 21
+itk_class: ConnectedThresholdImageFilter
+header: itkConnectedThresholdImageFilter.h
+module: ITKRegionGrowing
+ada_package: Itklib.Filters.Region_Growing.Connected_Threshold
+pixel_category: scalar
+output: same
+formal: pair
+generate_sources: true
+dimensions: [2, 3]
+brief: itk::ConnectedThresholdImageFilter. Set_Seed replaces the seed list; Add_Seed appends.
+members:
+  - name: Lower
+    itk: SetLower
+    kind: pixel
+    ada: Set_Lower
+  - name: Upper
+    itk: SetUpper
+    kind: pixel
+    ada: Set_Upper
+  - name: ReplaceValue
+    itk: SetReplaceValue
+    kind: pixel
+    ada: Set_Replace_Value
+  - name: Seed
+    itk: AddSeed
+    kind: seed
+    ada: Set_Seed
+    clear_first: true
+  - name: AddSeed
+    itk: AddSeed
+    kind: seed
+    ada: Add_Seed
+adaimg:
+  option: grow
+  help: '-grow x,y,lo:hi     connected threshold from seed (x,y)'

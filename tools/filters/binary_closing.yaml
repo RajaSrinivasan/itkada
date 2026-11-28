@@ -1,0 +1,24 @@
+name: BinaryMorphologicalClosing
+id: 18
+itk_class: BinaryMorphologicalClosingImageFilter
+header: itkBinaryMorphologicalClosingImageFilter.h
+module: ITKBinaryMathematicalMorphology
+ada_package: Itklib.Filters.Morphology.Binary_Closing
+pixel_category: scalar
+output: same
+formal: pair
+generate_sources: true
+structuring_element: ball
+dimensions: [2, 3]
+brief: itk::BinaryMorphologicalClosingImageFilter with a ball structuring element.
+members:
+
+  - name: Radius
+    itk: SetKernel
+    kind: ball_radius
+    ada: Set_Radius
+
+  - name: ForegroundValue
+    itk: SetForegroundValue
+    kind: pixel
+    ada: Set_Foreground_Value

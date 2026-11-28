@@ -1,0 +1,13 @@
+name: Cast
+id: 23
+itk_class: CastImageFilter
+header: itkCastImageFilter.h
+module: ITKImageFilterBase
+ada_package: Itklib.Filters.Image_Intensity.Cast
+pixel_category: scalar
+output: cast
+formal: pair
+generate_sources: true
+dimensions: [2, 3]
+brief: itk::CastImageFilter. Input and output pixels may differ; both must be built.
+members:

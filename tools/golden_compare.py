@@ -177,6 +177,30 @@ def main() -> None:
                 image, [4, 3], [1, 1]
             ), 0),
             ("edge", ["-edge"], gradient, 2),
+            ("erode", ["-erode", "1"], lambda image: sitk.GrayscaleErode(image, [1, 1]), 0),
+            ("dilate", ["-dilate", "1"], lambda image: sitk.GrayscaleDilate(image, [1, 1]), 0),
+            (
+                "otsu",
+                ["-otsu"],
+                lambda image: sitk.Cast(sitk.OtsuThreshold(image, 1, 0, 128), sitk.sitkUInt16) * 65535,
+                0,
+            ),
+            (
+                "grow",
+                ["-grow", "1,1,0:2000"],
+                lambda image: sitk.Cast(
+                    sitk.ConnectedThreshold(
+                        image,
+                        seedList=[(1, 1)],
+                        lower=0,
+                        upper=2000,
+                        replaceValue=1,
+                    ),
+                    sitk.sitkUInt16,
+                )
+                * 65535,
+                0,
+            ),
         ]
 
         for name, options, reference, tolerance in cases:

@@ -1,4 +1,5 @@
 with Interfaces.C;
+with Itklib.Supported;
 with Itklib.Thin;
 
 package body Itklib.Images with SPARK_Mode => Off is
@@ -228,8 +229,12 @@ package body Itklib.Images with SPARK_Mode => Off is
    end Disconnect_Pipeline;
 
 begin
-   if not Itklib.Thin.Is_Supported (Pixel_Kind_Id, Dimension) then
+   if not Itklib.Supported.Image_Built (Pixel_Kind_Id, Dimension) then
       raise Unsupported_Instantiation
         with "ITK image is not built for this pixel kind and dimension";
+   end if;
+   if not Itklib.Thin.Is_Supported (Pixel_Kind_Id, Dimension) then
+      raise Unsupported_Instantiation
+        with "Ada Supported and itklib_supported disagree";
    end if;
 end Itklib.Images;

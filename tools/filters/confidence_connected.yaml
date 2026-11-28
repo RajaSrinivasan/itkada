@@ -1,0 +1,34 @@
+name: ConfidenceConnected
+id: 22
+itk_class: ConfidenceConnectedImageFilter
+header: itkConfidenceConnectedImageFilter.h
+module: ITKRegionGrowing
+ada_package: Itklib.Filters.Region_Growing.Confidence_Connected
+pixel_category: scalar
+output: same
+formal: pair
+generate_sources: true
+dimensions: [2, 3]
+brief: itk::ConfidenceConnectedImageFilter. The confidence interval is multiplier times the neighborhood standard deviation.
+members:
+  - name: Multiplier
+    itk: SetMultiplier
+    kind: double
+    ada: Set_Multiplier
+  - name: NumberOfIterations
+    itk: SetNumberOfIterations
+    kind: unsigned
+    ada: Set_Number_Of_Iterations
+  - name: InitialNeighborhoodRadius
+    itk: SetInitialNeighborhoodRadius
+    kind: unsigned
+    ada: Set_Initial_Neighborhood_Radius
+  - name: ReplaceValue
+    itk: SetReplaceValue
+    kind: pixel
+    ada: Set_Replace_Value
+  - name: Seed
+    itk: AddSeed
+    kind: seed
+    ada: Set_Seed
+    clear_first: true

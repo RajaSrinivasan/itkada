@@ -1,6 +1,7 @@
 #pragma once
 
 #include "itklib.h"
+#include "itklib_pixels.hpp"
 
 #include "itkConfigure.h"
 #include "itkDataObject.h"
@@ -12,11 +13,14 @@
 #include "itkSmartPointer.h"
 
 #include <atomic>
+#include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <limits>
 #include <mutex>
 #include <new>
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -41,10 +45,15 @@ struct itklib_object {
   itk::LightObject * obj;
   itk::LightObject * anchor;
   itklib_pixel_id pixel;
+  /* Cast and other dual-pixel filters store a different output id.
+     Image-to-image filters leave this equal to pixel. */
+  itklib_pixel_id output_pixel;
   unsigned dim;
   int klass;
   std::atomic<int> refs;
 };
+
+#include "itklib_classes.inc"
 
 struct itklib_status {
   int code;
@@ -66,11 +75,7 @@ itklib_live_wrappers ()
   return count;
 }
 
-inline bool
-itklib_pixel_dim_built (itklib_pixel_id pixel, unsigned dimension)
-{
-  return pixel == ITKLIB_UINT16 && (dimension == 2 || dimension == 3);
-}
+#include "itklib_builtin.hpp"
 
 inline void
 itklib_copy_text (char * destination, size_t capacity, const char * source)
@@ -171,9 +176,35 @@ itklib_arm (itk::Object * object)
 /* The returned wrapper owns exactly one ITK reference, taken here.
    The caller's smart pointer must still be alive and is expected to
    drop its own reference when it goes out of scope. */
+template <typename Pixel>
+Pixel
+itklib_from_double (double value, const char * where)
+{
+  if (!std::isfinite (value))
+    {
+      throw itklib_status{ITKLIB_E_ARG, "value is not finite", where};
+    }
+  if constexpr (std::is_floating_point_v<Pixel>)
+    {
+      return static_cast<Pixel> (value);
+    }
+  else
+    {
+      const long long rounded = std::llround (value);
+      const auto lowest = static_cast<long long> (std::numeric_limits<Pixel>::lowest ());
+      const auto highest = static_cast<long long> (std::numeric_limits<Pixel>::max ());
+      if (rounded < lowest || rounded > highest)
+        {
+          throw itklib_status{ITKLIB_E_ARG, "value is outside the pixel range", where};
+        }
+      return static_cast<Pixel> (rounded);
+    }
+}
+
 inline itklib_object *
 itklib_adopt (itk::LightObject * raw, itklib_pixel_id pixel, unsigned dimension,
-              int klass, bool arm_object)
+              int klass, bool arm_object,
+              itklib_pixel_id output_pixel = static_cast<itklib_pixel_id> (0))
 {
   if (raw == nullptr)
     {
@@ -184,6 +215,8 @@ itklib_adopt (itk::LightObject * raw, itklib_pixel_id pixel, unsigned dimension,
   wrap->obj = raw;
   wrap->anchor = nullptr;
   wrap->pixel = pixel;
+  wrap->output_pixel =
+    output_pixel == static_cast<itklib_pixel_id> (0) ? pixel : output_pixel;
   wrap->dim = dimension;
   wrap->klass = klass;
   wrap->refs.store (1, std::memory_order_relaxed);

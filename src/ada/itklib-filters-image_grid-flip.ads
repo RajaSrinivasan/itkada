@@ -1,9 +1,14 @@
 with Itklib.Images;
 with Itklib.Process_Object;
+with Itklib.Supported;
 
 generic
    with package Img is new Itklib.Images (<>);
 package Itklib.Filters.Image_Grid.Flip with SPARK_Mode => Off is
+   pragma Compile_Time_Error
+     (not Itklib.Supported.Flip (Img.Pixel_Kind_Id, Img.Image_Dimension),
+      "Flip is not built for this pixel kind and dimension");
+
    --  itk::FlipImageFilter. True flips that axis. Flip_About_Origin is
    --  ITK's default (True): the origin moves so the physical extent stays
    --  put. adaimg -flip x|y sets one axis and leaves the default origin rule.

@@ -43,8 +43,11 @@ package body Itklib.Filters.Image_Statistics.Statistics with SPARK_Mode => Off i
    end Mean;
 
 begin
-   if not Thin.Is_Supported (Img.Pixel_Kind_Id, Img.Image_Dimension) then
+   if not Itklib.Supported.Agrees
+     (Itklib.Supported.Statistics, Img.Pixel_Kind_Id, Img.Pixel_Kind_Id,
+      Img.Image_Dimension)
+   then
       raise Unsupported_Instantiation with
-        "Statistics is not built for this pixel kind and dimension";
+        "Statistics Ada support and the C table disagree";
    end if;
 end Itklib.Filters.Image_Statistics.Statistics;

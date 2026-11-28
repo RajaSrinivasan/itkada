@@ -1,10 +1,18 @@
 with Itklib.Images;
 with Itklib.Process_Object;
+with Itklib.Supported;
 
 generic
    with package Input is new Itklib.Images (<>);
    with package Output is new Itklib.Images (<>);
 package Itklib.Filters.Image_Grid.Resample with SPARK_Mode => Off is
+   pragma Compile_Time_Error
+     (Input.Pixel_Kind_Id /= Output.Pixel_Kind_Id
+      or else Input.Image_Dimension /= Output.Image_Dimension
+      or else not Itklib.Supported.Resample
+        (Input.Pixel_Kind_Id, Input.Image_Dimension),
+      "Resample is not built for this pixel kind and dimension");
+
    --  itk::ResampleImageFilter with a linear interpolator and the identity
    --  transform. adaimg -resize uses this when the scale is not an integer
    --  shrink factor. Output size is round(input size * scale), at least 1,

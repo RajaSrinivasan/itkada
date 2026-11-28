@@ -1,0 +1,17 @@
+name: InvertIntensity
+id: 29
+itk_class: InvertIntensityImageFilter
+header: itkInvertIntensityImageFilter.h
+module: ITKImageIntensity
+ada_package: Itklib.Filters.Image_Intensity.Invert_Intensity
+pixel_category: scalar
+output: same
+formal: pair
+generate_sources: true
+dimensions: [2, 3]
+brief: itk::InvertIntensityImageFilter. Set_Maximum is the value that maps to zero.
+members:
+  - name: Maximum
+    itk: SetMaximum
+    kind: pixel
+    ada: Set_Maximum

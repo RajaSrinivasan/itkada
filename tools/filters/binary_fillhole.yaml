@@ -1,0 +1,22 @@
+name: BinaryFillhole
+id: 19
+itk_class: BinaryFillholeImageFilter
+header: itkBinaryFillholeImageFilter.h
+module: ITKLabelMap
+ada_package: Itklib.Filters.Morphology.Binary_Fillhole
+pixel_category: scalar
+output: same
+formal: pair
+generate_sources: true
+itk_arity: 1
+dimensions: [2, 3]
+brief: itk::BinaryFillholeImageFilter. Fills holes whose boundary is the foreground value.
+members:
+  - name: ForegroundValue
+    itk: SetForegroundValue
+    kind: pixel
+    ada: Set_Foreground_Value
+  - name: FullyConnected
+    itk: SetFullyConnected
+    kind: bool
+    ada: Set_Fully_Connected

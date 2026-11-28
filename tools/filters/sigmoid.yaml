@@ -1,0 +1,29 @@
+name: Sigmoid
+id: 28
+itk_class: SigmoidImageFilter
+header: itkSigmoidImageFilter.h
+module: ITKImageIntensity
+ada_package: Itklib.Filters.Image_Intensity.Sigmoid
+pixel_category: scalar
+output: same
+formal: pair
+generate_sources: true
+dimensions: [2, 3]
+brief: itk::SigmoidImageFilter.
+members:
+  - name: Alpha
+    itk: SetAlpha
+    kind: double
+    ada: Set_Alpha
+  - name: Beta
+    itk: SetBeta
+    kind: double
+    ada: Set_Beta
+  - name: OutputMinimum
+    itk: SetOutputMinimum
+    kind: pixel
+    ada: Set_Output_Minimum
+  - name: OutputMaximum
+    itk: SetOutputMaximum
+    kind: pixel
+    ada: Set_Output_Maximum

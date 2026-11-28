@@ -1,0 +1,32 @@
+name: OtsuThreshold
+id: 20
+itk_class: OtsuThresholdImageFilter
+header: itkOtsuThresholdImageFilter.h
+module: ITKThresholding
+ada_package: Itklib.Filters.Thresholding.Otsu_Threshold
+pixel_category: scalar
+output: same
+formal: pair
+generate_sources: true
+dimensions: [2, 3]
+brief: itk::OtsuThresholdImageFilter. Inside and outside values are written; Threshold reads the chosen level after Update.
+members:
+  - name: InsideValue
+    itk: SetInsideValue
+    kind: pixel
+    ada: Set_Inside_Value
+  - name: OutsideValue
+    itk: SetOutsideValue
+    kind: pixel
+    ada: Set_Outside_Value
+  - name: NumberOfHistogramBins
+    itk: SetNumberOfHistogramBins
+    kind: unsigned
+    ada: Set_Number_Of_Histogram_Bins
+  - name: Threshold
+    itk: GetThreshold
+    kind: getter_double
+    ada: Threshold
+adaimg:
+  option: otsu
+  help: '-otsu               Otsu threshold, inside 65535, outside 0'

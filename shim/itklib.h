@@ -83,19 +83,11 @@ int itklib_writer_new (itklib_pixel_id pixel, unsigned dimension,
 int itklib_writer_set_file (itklib_object * writer, const char * path,
                             itklib_error * error);
 
-int itklib_discrete_gaussian_new (itklib_pixel_id input_pixel,
-                                  itklib_pixel_id output_pixel,
-                                  unsigned dimension, itklib_object ** out,
-                                  itklib_error * error);
-int itklib_discrete_gaussian_set_variance (itklib_object * filter,
-                                           const double * variance,
-                                           itklib_error * error);
-int itklib_discrete_gaussian_set_use_image_spacing (itklib_object * filter,
-                                                    int enabled,
-                                                    itklib_error * error);
-int itklib_discrete_gaussian_set_maximum_error (itklib_object * filter,
-                                                const double * maximum_error,
-                                                itklib_error * error);
+/* Generated filter prototypes. tools/generate.py rewrites that header. */
+#include "itklib_filters.h"
+
+int itklib_filter_supported (int filter_id, int input_pixel, int output_pixel,
+                             unsigned dimension);
 
 enum {
   ITKLIB_FILTER_MEDIAN = 1,

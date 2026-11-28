@@ -1,4 +1,5 @@
 package Itklib.Filters with SPARK_Mode => Off is
-   --  Hand-written UInt16 filters for the Phase 1 MVP. Code generation
-   --  replaces these bodies in Phase 2.
+   --  Image filters. Phase 1 packages that are still hand-written live
+   --  next to this spec. Phase 2 packages are generated into src/ada/generated
+   --  from tools/filters/*.yaml.
 end Itklib.Filters;

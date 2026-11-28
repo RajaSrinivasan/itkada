@@ -6,8 +6,9 @@ GPR project, and shared library are `itklib`. The top-level Ada package is
 `itkada`.
 
 Phase 1 is the MVP: 2D and 3D `UInt16` images, geometry, zero-copy buffers,
-PNG I/O, and the `adaimg` filters. ITK does the work. Ada holds controlled
-handles and a lazy pipeline. Design background is the
+PNG I/O, and the `adaimg` filters. Phase 2 generates filters and pixel
+types from YAML. ITK does the work. Ada holds controlled handles and a
+lazy pipeline. Design background is the
 [itklib strategy](https://cursor.com/canvas/store-87a8889a-1eb8-4d47-b94b-44c9de3de305/14b526e1-7e87-4d37-a858-2f4b4d3bb64f)
 (still a draft). Tracked by GitHub issues #1, #2, and #11–#28.
 
@@ -27,8 +28,14 @@ tests/                     Phase 0 and Phase 1 drivers, SPARK projects
 tools/build_itk.sh         ITK 5.4.8 build
 tools/itk_modules.txt      modules that build enables
 tools/itk_paths/           CMake probe that writes itk_paths.gpr
+tools/filters/             one YAML file per filter
+tools/matrix.yaml          pre-built pixel/dimension matrix
+tools/pixel_types.yaml     ITK scalar pixel catalog
+tools/generate.py          YAML + Jinja2 generator
+tools/add_pixel_type.py    add or remove a pixel type
 tools/run_phase0_tests.sh
 tools/run_phase1_tests.sh  unit tests, adaimg smoke, SPARK, goldens
+tools/run_phase2_tests.sh  freshness, phase 1, float32 generator leg
 tools/run_spark.sh         gnatprove silver
 tools/golden_compare.py    SimpleITK comparison
 ```
@@ -76,7 +83,19 @@ bash tools/run_phase1_tests.sh
 
 `alr build` runs `tools/generate_itk_paths.sh` first. That probe calls
 `find_package` and writes include paths, compile flags, and the link line
-into `itk_paths.gpr`.
+into `itk_paths.gpr`. It does not run Python. Generated Ada and C++ are
+already committed.
+
+```
+python3 tools/generate.py --check
+bash tools/run_phase2_tests.sh
+```
+
+`tools/run_phase2_tests.sh` reruns the phase 1 suite, checks that a
+float32 `DiscreteGaussian` is rejected at compile time, then runs
+`tools/add_pixel_type.py --pixel float32 --dims 2,3` and builds that
+instantiation. The default matrix stays UInt16. Set
+`ITKLIB_SKIP_FLOAT32=1` to skip that leg.
 
 `tools/run_phase1_tests.sh` builds the library, runs the Phase 0 driver,
 the Phase 1 driver, an `adaimg` smoke test, `gnatprove` silver (unless
@@ -132,7 +151,12 @@ and mean. Spacing has no unit: PNG does not carry ITK's spatial units.
 | `-resize N%` | `Shrink` or `Resample` | see below |
 | `-flip x` or `-flip y` | `Flip` | ITK also moves the origin (`FlipAboutOrigin` true) |
 | `-crop WxH+X+Y` | `Extract` | index `(X,Y)`, size `(W,H)`, origin 0. `+` only |
-| `-edge` | `Gradient_Magnitude` | UInt16 magnitude. Canny needs float32 and is not in this phase |
+| `-edge` | `Gradient_Magnitude` | UInt16 magnitude |
+| `-erode r` | `Grayscale_Erode` | ball radius on x and y |
+| `-dilate r` | `Grayscale_Dilate` | ball radius on x and y |
+| `-otsu` | `Otsu_Threshold` | inside 65535, outside 0 |
+| `-grow x,y,lo:hi` | `Connected_Threshold` | seed `(x,y)`, inclusive bounds, replace 65535 |
+| `-canny sigma` | `Canny_Edge_Detection` | float32 only; not in the pre-built matrix |
 
 `-resize`: `N` is a positive integer. `100%` copies the image. If `N < 100`
 and `100` is divisible by `N`, the image is shrunk by `100/N` on each axis
@@ -144,8 +168,18 @@ divided by the same scale. The scale is applied when `Update` runs, so the
 reader does not have to execute early.
 
 `-edge` is gradient magnitude cast to `UInt16`, so the PNG writer needs no
-cast. Canny and other real-valued edge detectors wait for
-`tools/add_pixel_type.py --pixel float32` in a later phase.
+cast. `-canny` is the real-valued detector and needs
+`tools/add_pixel_type.py --pixel float32 --dims 2,3` before it can run;
+the default UInt16 build prints that requirement and exits 1.
+
+Phase 3 adds grayscale and binary morphology, Otsu, connected and
+confidence region growing, cast, intensity windowing, sigmoid, invert,
+and mean on the pre-built UInt16 matrix. Canny and both anisotropic
+diffusion filters are `real_only`: the packages are generated, and they
+become usable after float32 is added. CT data is often signed; add
+`--pixel int16` the same way when a signed matrix is needed. DICOM I/O
+stays in phase 4.
+
 
 A missing file or an unknown option exits with status 1 and a message on
 stderr. `adaimg -h` prints the usage and exits 0.
@@ -178,6 +212,47 @@ types built in place by `Create`.
 | `Itklib.Filters.Image_Grid.Extract` | in-plane crop. Same dimension, no axis collapse |
 | `Itklib.Filters.Image_Gradient.Gradient_Magnitude` | UInt16 magnitude |
 | `Itklib.Filters.Image_Statistics.Statistics` | min, max, mean. No image output |
+
+## Adding a filter
+
+Write `tools/filters/<name>.yaml` (SimpleITK's Apache-2.0 filter
+descriptions are the shape: class, members, pixel category, plus
+`ada_package`, `pixel_category`, `output`, `dimensions`, and `tests`).
+Then:
+
+```
+python3 tools/generate.py
+```
+
+Commit the YAML and the files it writes under `src/ada/generated/`,
+`shim/generated/`, and `tests/generated/`. One YAML file produces the C
+dispatch, the Ada generic (`SPARK_Mode => Off`), a `Itklib.Supported`
+row, and the generated test. `alr build` does not need Python after that.
+`tools/generate.py --check` fails when those files drift.
+
+Set `generate_sources: false` only for a filter whose shim is still
+hand-written. `add_pixel_type.py` prints that skip and does not extend it.
+
+## Adding a pixel type
+
+UInt16 × {2, 3} is the pre-built matrix in `tools/matrix.yaml`. Other ITK
+scalars are listed in `tools/pixel_types.yaml` and added with:
+
+```
+python3 tools/add_pixel_type.py --pixel float32 --dims 2,3 --dry-run
+python3 tools/add_pixel_type.py --pixel float32 --dims 2,3
+alr build
+```
+
+`--dry-run` and `--diff` write nothing. A second run is a no-op.
+`--remove` drops the pixel and regenerates. The command `try_compile`s
+`itk::Image` against the ITK install before it writes files. RGB, vector,
+and complex pixels are rejected. Real-only filters (Canny and anisotropic
+diffusion, when those YAML files exist) are skipped for integer pixels.
+The PNG writer is not generated for pixels PNG cannot store; the reason
+is printed. `Itklib.Supported` and the C `itklib_filter_supported` table
+come from the same matrix, and each filter checks both at compile time
+and during elaboration.
 
 `Extract` keeps the image dimension. A size of 1 does not drop an axis.
 If the input region is already known, a crop outside that region raises
